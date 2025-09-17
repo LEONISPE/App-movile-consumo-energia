@@ -1,31 +1,24 @@
 package com.back_servicios.app_cosultas_servicios.domain.dto.request;
 
+import com.back_servicios.app_cosultas_servicios.domain.enumerated.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Getter
+@Setter
+public class DTOadmin {
 
-public record DTOusuarios(
-
-@NotBlank(message = "el nombre no puede estar en blanco")
-String nombres,
-@NotBlank(message = "el apellido no puede estar nulo")
-String apellidos,
- @Email
- @NotBlank(message = "Email no puede estar vacío")
-String email,
-
-String telefono,
+    @NotBlank
+    @Email
+    private String Email;
     @Pattern(
             regexp = "^(?=.*[0-9])(?=.*[A-Z]).{8,}$",
             message = "Contraseña deber tener 8 caracteres, con al menos un digito y una mayúscula"
     )
-     String contraseña
-
-)
-        {
+    @NotBlank
+    private String contraseña;
+    private Role role;
 }

@@ -21,8 +21,7 @@ public class Tarifa_Servicio {
     private Long idTarifa;
 
     private BigDecimal precioTarifa;
-    private LocalDateTime fechaInicioTarifa;
-    private LocalDateTime fechaFinTarifa;
+
 @OneToOne
 @JoinColumn(name = "servicio_id")
 private Servicios servicios;

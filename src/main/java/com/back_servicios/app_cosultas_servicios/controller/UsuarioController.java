@@ -1,14 +1,17 @@
 package com.back_servicios.app_cosultas_servicios.controller;
 
+import com.back_servicios.app_cosultas_servicios.domain.dto.request.DTOadmin;
 import com.back_servicios.app_cosultas_servicios.domain.dto.request.DTOusuarios;
 import com.back_servicios.app_cosultas_servicios.domain.dto.response.DTOusuariosResponse;
 import com.back_servicios.app_cosultas_servicios.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+@SecurityRequirement(name = "bearer-key")
 @RestController
 @AllArgsConstructor
 public class UsuarioController {
@@ -16,14 +19,25 @@ public class UsuarioController {
     private final UsuarioService usuarioService;
 
 
+
+    @Operation(
+            summary = "Registrar usuario",
+            description = "Permite registrar un nuevo usuario con rol por defecto de dueño."
+    )
+    @PostMapping("/registrar/admin")
+    public ResponseEntity<DTOadmin> registrarAdmin(@RequestBody @Valid DTOadmin dto) {
+        DTOadmin dtOadmin = usuarioService.crearAdmin(dto);
+        return ResponseEntity.ok(dtOadmin);
+    }
+
     @Operation(
             summary = "Registrar usuario",
             description = "Permite registrar un nuevo usuario con rol por defecto de dueño."
     )
     @PostMapping("/registrar/usuario")
-    public ResponseEntity<String> crearusuario(@RequestBody DTOusuarios dtOusuarios){
-         usuarioService.crearUsuarios(dtOusuarios);
-         return ResponseEntity.ok("Usuario creado correctamente");
+    public ResponseEntity<DTOusuarios> crearusuario(@RequestBody @Valid DTOusuarios dtOusuarios){
+       DTOusuarios dtOusuarios1 = usuarioService.crearUsuarios(dtOusuarios);
+         return ResponseEntity.ok(dtOusuarios1);
 
     }
 
