@@ -1,6 +1,6 @@
 package com.back_servicios.app_cosultas_servicios.domain.dto.request;
 
-import com.back_servicios.app_cosultas_servicios.domain.enumerated.Role;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -20,5 +20,4 @@ public class DTOadmin {
     )
     @NotBlank
     private String contraseña;
-    private Role role;
 }

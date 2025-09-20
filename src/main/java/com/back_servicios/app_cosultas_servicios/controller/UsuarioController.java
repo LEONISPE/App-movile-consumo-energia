@@ -12,8 +12,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @SecurityRequirement(name = "bearer-key")
+@CrossOrigin(origins = "http://localhost:5173/", allowedHeaders = "*", allowCredentials = "true")
 @RestController
 @AllArgsConstructor
+@RequestMapping("/user")
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
@@ -21,8 +23,8 @@ public class UsuarioController {
 
 
     @Operation(
-            summary = "Registrar usuario",
-            description = "Permite registrar un nuevo usuario con rol por defecto de dueño."
+            summary = "Registrar admin",
+            description = "Permite registrar un nuevo usuario administrador  con rol por defecto de admin."
     )
     @PostMapping("/registrar/admin")
     public ResponseEntity<DTOadmin> registrarAdmin(@RequestBody @Valid DTOadmin dto) {

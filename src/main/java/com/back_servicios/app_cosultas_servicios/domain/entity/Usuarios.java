@@ -25,7 +25,7 @@ public class Usuarios implements UserDetails {
     private Long idUsuario;
     private String nombres;
     private String apellidos;
-    private String Email;
+    private String email;
     private String telefono;
     private String contraseña;
     @Enumerated(EnumType.STRING)
@@ -46,7 +46,7 @@ public class Usuarios implements UserDetails {
 
     @Override
     public String getUsername() {
-       return Email;
+       return email;
     }
 
     @Override
