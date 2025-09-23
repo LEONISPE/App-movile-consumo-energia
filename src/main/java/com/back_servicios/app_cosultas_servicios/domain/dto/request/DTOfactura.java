@@ -7,18 +7,16 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class DTOconsumoServicio {
+public class DTOfactura {
 
-    private LocalDateTime fecha;
-    private double consumo;
-    private BigDecimal costo;
+    private LocalDate fecha_periodoInicio;
+    private LocalDate fecha_periodoFin;
+    private BigDecimal consumoTotal;
     private Long hogar_id;
     private Long servicio_id;
-
 }

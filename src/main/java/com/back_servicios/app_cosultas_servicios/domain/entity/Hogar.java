@@ -19,6 +19,7 @@ public class Hogar {
     private Long idHogar;
     private String calle;
     private String carrera;
+    @Enumerated(EnumType.STRING)
     private Ciudad ciudad;
 
     @OneToOne

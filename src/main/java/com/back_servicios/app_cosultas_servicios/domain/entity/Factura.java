@@ -19,7 +19,8 @@ public class Factura {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long facturaId;
 
-    private LocalDate fecha_periodo;
+    private LocalDate fecha_periodoInicio;
+    private LocalDate fecha_periodoFin;
     private BigDecimal consumoTotal;
     private BigDecimal costo_total;
 

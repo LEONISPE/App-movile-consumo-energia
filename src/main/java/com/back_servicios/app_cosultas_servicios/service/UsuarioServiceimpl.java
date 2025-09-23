@@ -64,6 +64,7 @@ public DTOusuarios crearUsuarios(DTOusuarios dtOusuarios){
         String encryptedPassword = bCryptPasswordEncoder.encode(dtOusuarios.contraseña());
 
     Usuarios usuarios =  usuarioCreateMapper.toEntity(dtOusuarios);
+    usuarios.setContraseña(encryptedPassword);
     usuarioRepository.save(usuarios);
   return dtOusuarios;
 }

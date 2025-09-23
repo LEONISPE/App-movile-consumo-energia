@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -29,7 +30,8 @@ public class Consumo_Servicio {
     @JoinColumn(name = "servicio_id")
     private Servicios servicios;
 
-    private LocalDateTime fechaConsumo;
-    private BigDecimal costo;
+     private LocalDateTime fecha;
+     private double consumo;
+     private BigDecimal costo;
 
 }

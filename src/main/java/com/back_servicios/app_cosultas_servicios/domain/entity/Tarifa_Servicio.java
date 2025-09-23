@@ -7,7 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+
 
 @Entity
 @Getter
@@ -20,9 +21,11 @@ public class Tarifa_Servicio {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idTarifa;
 
-    private BigDecimal precioTarifa;
+    private BigDecimal preciounidad;
+    private LocalDate fechaInicio;
+    private LocalDate fechaFin;
 
-@OneToOne
+@ManyToOne
 @JoinColumn(name = "servicio_id")
 private Servicios servicios;
 

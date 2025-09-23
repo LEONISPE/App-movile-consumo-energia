@@ -21,13 +21,17 @@ public class HogarServiceimpl implements HogarService {
     @Override
 public DTOhogar createHogar(DTOhogar dtohogar, Long idUsuario) {
 
-    Usuarios usuarios = usuarioRepository.findById(idUsuario).get();
-    if (usuarios == null) {
-        throw new ValidationException("usuario no encontrado");
-    }
+        Usuarios usuario = usuarioRepository.findById(idUsuario)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con id: " + idUsuario));
+
+
+        if (dtohogar.getCiudad() == null) {
+            throw new ValidationException("La ciudad es obligatoria");
+        }
 
     Hogar hogar = hogarCreateMapper.toEntity(dtohogar);
-    hogar.setUsuario(usuarios);
+        System.out.println("Usuario encontrado: " + usuario.getIdUsuario());
+    hogar.setUsuario(usuario);
     hogarRepository.save(hogar);
   return dtohogar;
 

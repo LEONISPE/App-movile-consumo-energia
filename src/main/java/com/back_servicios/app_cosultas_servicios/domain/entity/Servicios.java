@@ -8,6 +8,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -19,11 +22,13 @@ public class Servicios {
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+   @Enumerated(EnumType.STRING)
     private ServiciosEnum  servicios;
+   @Enumerated(EnumType.STRING)
     private Unidad unidad;
 
-    @OneToOne(mappedBy = "servicios")
-    private Tarifa_Servicio tarifa_servicio;
+    @OneToMany(mappedBy = "servicio", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Tarifa_Servicio> tarifas = new ArrayList<>();
 
     @OneToOne(mappedBy = "servicios")
     private Factura factura;
