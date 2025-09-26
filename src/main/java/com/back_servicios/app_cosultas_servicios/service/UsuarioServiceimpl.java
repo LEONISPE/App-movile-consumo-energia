@@ -81,7 +81,6 @@ Usuarios usuarios = usuarioCreateMapper.toEntity(dtOusuarios);
 
 @Override
 public DTOusuariosResponse getUsuarios(Long id){
-
 return usuarioRepository.findById(id)
         .map(usuarios -> new DTOusuariosResponse(
                 usuarios.getNombres(),

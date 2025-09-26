@@ -1,11 +1,10 @@
 package com.back_servicios.app_cosultas_servicios.service;
 
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
+import com.back_servicios.app_cosultas_servicios.domain.dto.response.ConsumoDTODiarioAgua;
+import com.back_servicios.app_cosultas_servicios.domain.dto.response.DTOconsumoAcomulado;
 
-@Service
-@AllArgsConstructor
-public class AguaService {
+public interface AguaService {
 
-
+    ConsumoDTODiarioAgua calcularConsumoActual();
+    DTOconsumoAcomulado obtenerConsumoAcomulado();
 }

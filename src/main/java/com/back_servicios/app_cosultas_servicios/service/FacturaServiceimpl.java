@@ -1,16 +1,17 @@
 package com.back_servicios.app_cosultas_servicios.service;
 
 import com.back_servicios.app_cosultas_servicios.domain.dto.request.DTOfactura;
-import com.back_servicios.app_cosultas_servicios.domain.entity.Factura;
-import com.back_servicios.app_cosultas_servicios.domain.entity.Hogar;
-import com.back_servicios.app_cosultas_servicios.domain.entity.Servicios;
-import com.back_servicios.app_cosultas_servicios.domain.entity.Tarifa_Servicio;
+import com.back_servicios.app_cosultas_servicios.domain.entity.*;
+import com.back_servicios.app_cosultas_servicios.domain.enumerated.Role;
 import com.back_servicios.app_cosultas_servicios.domain.mapper.request.FacturaCreateMapper;
+import com.back_servicios.app_cosultas_servicios.exceptions.ValidationException;
 import com.back_servicios.app_cosultas_servicios.repository.FacturaRepository;
 import com.back_servicios.app_cosultas_servicios.repository.HogarRepository;
 import com.back_servicios.app_cosultas_servicios.repository.PrecioTarifaRepository;
 import com.back_servicios.app_cosultas_servicios.repository.ServiciosRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -28,14 +29,22 @@ public class FacturaServiceimpl  implements FacturaService {
 
     @Override
     public void crearFactura(DTOfactura dtOfactura) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Usuarios Auth = (Usuarios) authentication.getPrincipal();
+
+        if(Auth.getRole() != Role.ADMIN){
+            throw new ValidationException("El usuario no tiene role administrador");
+        }
+
         Hogar hogar = hogarRepository.findById(dtOfactura.getHogar_id())
-                .orElseThrow(() -> new RuntimeException("Hogar no encontrado"));
+                .orElseThrow(() -> new ValidationException("Hogar no encontrado"));
 
         Servicios servicios = serviciosRepository.findById(dtOfactura.getServicio_id())
-                .orElseThrow(() -> new RuntimeException("Servicio no encontrado"));
+                .orElseThrow(() -> new ValidationException("Servicio no encontrado"));
 
         Tarifa_Servicio tarifa = precioTarifaRepository.findByServiciosId(servicios.getId())
-                .orElseThrow(() -> new RuntimeException("Tarifa no encontrada"));
+                .orElseThrow(() -> new ValidationException("Tarifa no encontrada"));
 
         BigDecimal costoTotal = dtOfactura.getConsumoTotal()
                 .multiply(tarifa.getPreciounidad());

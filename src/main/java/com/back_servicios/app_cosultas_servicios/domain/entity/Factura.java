@@ -24,12 +24,12 @@ public class Factura {
     private BigDecimal consumoTotal;
     private BigDecimal costo_total;
 
-    @OneToOne
-    @JoinColumn(name = "hogar_id")
+    @ManyToOne
+    @JoinColumn(name = "hogar_id", nullable = false)
     private Hogar hogar;
 
-    @OneToOne
-    @JoinColumn(name = "servicio_id")
+    @ManyToOne
+    @JoinColumn(name = "servicio_id", nullable = false)
     private Servicios servicios;
 
 }

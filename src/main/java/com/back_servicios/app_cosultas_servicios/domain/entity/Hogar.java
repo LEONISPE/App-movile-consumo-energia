@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @Entity
@@ -26,7 +28,10 @@ public class Hogar {
     @JoinColumn(name = "usuario_id")
     private Usuarios usuario;
 
-    @OneToOne(mappedBy = "hogar")
-    private Factura factura;
+    @OneToMany(mappedBy = "hogar")
+    private List<Factura> facturas;
+
+    @OneToMany(mappedBy = "hogar")
+    private List<Consumo_Servicio> consumo_servicio;
 
 }

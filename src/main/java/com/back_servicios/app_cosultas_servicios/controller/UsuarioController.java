@@ -54,6 +54,10 @@ public class UsuarioController {
 
     }
 
+    @Operation(
+            summary = "obtener datos del usuario",
+            description = "metodo get para obtener datos del usuario"
+    )
     @GetMapping("/{id}")
     public ResponseEntity<DTOusuariosResponse> obtenerusuario(@PathVariable Long id) {
         DTOusuariosResponse dtOusuariosResponse1 = usuarioService.getUsuarios(id);

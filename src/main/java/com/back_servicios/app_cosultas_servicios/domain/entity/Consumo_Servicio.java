@@ -22,16 +22,16 @@ public class Consumo_Servicio {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idConsumo;
 
-    @OneToOne
-    @JoinColumn(name = "hogar_id")
+    @ManyToOne
+    @JoinColumn(name = "hogar_id", nullable = false)
     private Hogar hogar;
 
-    @OneToOne
-    @JoinColumn(name = "servicio_id")
+    @ManyToOne
+    @JoinColumn(name = "servicio_id", nullable = false)
     private Servicios servicios;
 
-     private LocalDateTime fecha;
-     private double consumo;
-     private BigDecimal costo;
+    private LocalDate fecha;
+    private BigDecimal consumo;
+    private BigDecimal costo;
 
 }

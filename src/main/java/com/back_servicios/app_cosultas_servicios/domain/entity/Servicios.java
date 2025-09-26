@@ -27,13 +27,13 @@ public class Servicios {
    @Enumerated(EnumType.STRING)
     private Unidad unidad;
 
-    @OneToMany(mappedBy = "servicio", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "servicios", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Tarifa_Servicio> tarifas = new ArrayList<>();
 
-    @OneToOne(mappedBy = "servicios")
-    private Factura factura;
+    @OneToMany(mappedBy = "servicios")
+    private List<Factura> facturas;
 
-    @OneToOne(mappedBy = "servicios")
-    private Consumo_Servicio consumo_servicio;
+    @OneToMany(mappedBy = "servicios")
+    private List<Consumo_Servicio> consumo_servicio;
 
 }
