@@ -1,5 +1,6 @@
 package com.back_servicios.app_cosultas_servicios.domain.entity;
 
+import com.back_servicios.app_cosultas_servicios.domain.enumerated.Categoria;
 import com.back_servicios.app_cosultas_servicios.domain.enumerated.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -18,7 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Usuarios implements UserDetails {
+public class Usuarios  implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,9 +28,11 @@ public class Usuarios implements UserDetails {
     private String apellidos;
     private String email;
     private String telefono;
-    private String contraseña;
+    private String password;
     @Enumerated(EnumType.STRING)
     private Role role  = Role.DUEÑO;
+    @Enumerated(EnumType.STRING)
+    private Categoria categoria = Categoria.ADULTO;
 
     @OneToOne(mappedBy = "usuario")
     private Hogar hogar;
@@ -41,7 +44,7 @@ public class Usuarios implements UserDetails {
 
     @Override
     public String getPassword() {
-        return contraseña;
+        return password;
     }
 
     @Override

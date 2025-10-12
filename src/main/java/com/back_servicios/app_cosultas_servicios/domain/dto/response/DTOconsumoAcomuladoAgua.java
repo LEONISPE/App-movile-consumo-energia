@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class DTOconsumoAcomulado {
+public class DTOconsumoAcomuladoAgua {
     private BigDecimal consumoAcomulado;
     private BigDecimal costoAcomulado;
 }

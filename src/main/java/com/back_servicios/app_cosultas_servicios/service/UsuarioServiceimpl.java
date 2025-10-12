@@ -36,7 +36,7 @@ public class UsuarioServiceimpl  implements UsuarioService {
         String encryptedPassword = bCryptPasswordEncoder.encode(dtOadmin.getContraseña());
         Usuarios usuarios = new Usuarios();
         usuarios.setEmail(dtOadmin.getEmail());
-        usuarios.setContraseña(encryptedPassword);
+        usuarios.setPassword(encryptedPassword);
         usuarios.setRole(Role.ADMIN);
         usuarioRepository.save(usuarios);
         return dtOadmin;
@@ -64,7 +64,7 @@ public DTOusuarios crearUsuarios(DTOusuarios dtOusuarios){
         String encryptedPassword = bCryptPasswordEncoder.encode(dtOusuarios.contraseña());
 
     Usuarios usuarios =  usuarioCreateMapper.toEntity(dtOusuarios);
-    usuarios.setContraseña(encryptedPassword);
+    usuarios.setPassword(encryptedPassword);
     usuarioRepository.save(usuarios);
   return dtOusuarios;
 }

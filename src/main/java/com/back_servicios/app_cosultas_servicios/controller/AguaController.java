@@ -1,7 +1,7 @@
 package com.back_servicios.app_cosultas_servicios.controller;
 
 import com.back_servicios.app_cosultas_servicios.domain.dto.response.ConsumoDTODiarioAgua;
-import com.back_servicios.app_cosultas_servicios.domain.dto.response.DTOconsumoAcomulado;
+import com.back_servicios.app_cosultas_servicios.domain.dto.response.DTOconsumoAcomuladoAgua;
 import com.back_servicios.app_cosultas_servicios.service.AguaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -34,9 +34,9 @@ public class AguaController {
                     "desde el inicio del recibo hasta la fecha"
     )
     @GetMapping("/agua/consumo/acomulado")
-    public ResponseEntity<DTOconsumoAcomulado> verconsumoAcomuladoAgua() {
-        DTOconsumoAcomulado dtOconsumoAcomulado = aguaService.obtenerConsumoAcomulado();
-        return ResponseEntity.ok(dtOconsumoAcomulado);
+    public ResponseEntity<DTOconsumoAcomuladoAgua> verconsumoAcomuladoAgua() {
+        DTOconsumoAcomuladoAgua dtOconsumoAcomuladoAgua = aguaService.obtenerConsumoAcomulado();
+        return ResponseEntity.ok(dtOconsumoAcomuladoAgua);
     }
 
 }
