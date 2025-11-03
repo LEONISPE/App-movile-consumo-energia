@@ -2,6 +2,7 @@ package com.back_servicios.app_cosultas_servicios.domain.entity;
 
 import com.back_servicios.app_cosultas_servicios.domain.enumerated.Categoria;
 import com.back_servicios.app_cosultas_servicios.domain.enumerated.Role;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,6 +24,7 @@ public class Usuarios  implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_usuario")
     private Long idUsuario;
     private String nombres;
     private String apellidos;
@@ -35,6 +37,7 @@ public class Usuarios  implements UserDetails {
     private Categoria categoria = Categoria.ADULTO;
 
     @OneToOne(mappedBy = "usuario")
+    @JsonBackReference
     private Hogar hogar;
 
    @Override

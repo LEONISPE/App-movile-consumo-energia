@@ -3,6 +3,7 @@ package com.back_servicios.app_cosultas_servicios.service;
 import com.back_servicios.app_cosultas_servicios.domain.dto.request.DTOfactura;
 import com.back_servicios.app_cosultas_servicios.domain.entity.*;
 import com.back_servicios.app_cosultas_servicios.domain.enumerated.Role;
+import com.back_servicios.app_cosultas_servicios.domain.enumerated.ServiciosEnum;
 import com.back_servicios.app_cosultas_servicios.domain.mapper.request.FacturaCreateMapper;
 import com.back_servicios.app_cosultas_servicios.exceptions.ValidationException;
 import com.back_servicios.app_cosultas_servicios.repository.FacturaRepository;
@@ -15,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -56,4 +58,10 @@ public class FacturaServiceimpl  implements FacturaService {
         facturaRepository.save(factura);
     }
 
+    @Override
+    public List<Factura> obtenerFacturasPorUsuarioYServicio(Long usuarioId, ServiciosEnum servicio) {
+        return facturaRepository.findByUsuarioAndServicio(usuarioId, servicio);
+    }
 }
+
+

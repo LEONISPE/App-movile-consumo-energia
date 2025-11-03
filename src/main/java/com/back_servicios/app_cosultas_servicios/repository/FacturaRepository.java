@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
 
 public interface FacturaRepository extends JpaRepository<Factura, Long> {
 
@@ -18,4 +20,22 @@ public interface FacturaRepository extends JpaRepository<Factura, Long> {
             "AND f.servicios.servicios = :servicioEnum")
     BigDecimal calcularPromedioConsumo(@Param("hogarId") Long hogarId,
                                        @Param("servicioEnum") ServiciosEnum servicioEnum);
+
+
+
+
+    Optional<Factura> findTopByHogar_IdHogarAndServicios_ServiciosOrderByFechaPeriodoFinDesc(Long hogarId, ServiciosEnum servicioEnum);
+
+    @Query("""
+       SELECT f 
+       FROM Factura f 
+       WHERE f.hogar.usuario.idUsuario = :usuarioId 
+       AND f.servicios.servicios = :servicio
+       """)
+    List<Factura> findByUsuarioAndServicio(
+            @Param("usuarioId") Long usuarioId,
+            @Param("servicio") ServiciosEnum servicio
+    );
+
+
 }

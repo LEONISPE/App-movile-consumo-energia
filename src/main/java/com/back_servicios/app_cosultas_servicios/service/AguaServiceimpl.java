@@ -3,8 +3,7 @@ package com.back_servicios.app_cosultas_servicios.service;
 import com.back_servicios.app_cosultas_servicios.domain.dto.response.ConsumoDTODiarioAgua;
 import com.back_servicios.app_cosultas_servicios.domain.dto.response.DTOconsumoAcomuladoAgua;
 import com.back_servicios.app_cosultas_servicios.domain.entity.*;
-import com.back_servicios.app_cosultas_servicios.domain.enumerated.Estrato;
-import com.back_servicios.app_cosultas_servicios.domain.enumerated.Role;
+import com.back_servicios.app_cosultas_servicios.domain.enumerated.Estrato_Agua;
 import com.back_servicios.app_cosultas_servicios.domain.enumerated.ServiciosEnum;
 import com.back_servicios.app_cosultas_servicios.exceptions.ValidationException;
 import com.back_servicios.app_cosultas_servicios.infra.FactoresConsumos.Estacionalidad;
@@ -23,7 +22,7 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-
+import java.util.Optional;
 
 
 @Service
@@ -126,7 +125,7 @@ public class AguaServiceimpl implements AguaService {
                 .orElseThrow(() -> new ValidationException("No existe tarifa vigente para Agua"));
 
 
-// 1. Calcular promedio histórico de facturas
+
         BigDecimal promedio = facturaRepository.calcularPromedioConsumo(
                 hogar.getIdHogar(),
                 ServiciosEnum.AGUA
@@ -143,31 +142,52 @@ public class AguaServiceimpl implements AguaService {
                 .setScale(4, RoundingMode.HALF_UP);
 
 
-        // 4️⃣ Ajuste por número y tipo de integrantes del hogar
+
         double factorHogar = IntegrantesFamilia.calcularFactorHogar(hogar);
         BigDecimal factorHogarBd = BigDecimal.valueOf(factorHogar);
 
         BigDecimal promedioFinal = promedioAjustado.multiply(factorHogarBd)
                 .setScale(4, RoundingMode.HALF_UP);
 
-        // 2. Derivar consumo por hora
+
         int diasMes = LocalDate.now().lengthOfMonth();
         BigDecimal consumoDiario = promedioFinal.divide(BigDecimal.valueOf(diasMes), 4, RoundingMode.HALF_UP);
         BigDecimal consumoHora = consumoDiario.divide(BigDecimal.valueOf(24), 4, RoundingMode.HALF_UP);
 
-        // 3. Determinar fecha de inicio del recibo
-        LocalDateTime ahora = LocalDateTime.now();
-        LocalDate inicioRecibo = LocalDate.of(ahora.getYear(), ahora.getMonth(), 25);
-        LocalDateTime inicioReciboMesActual = inicioRecibo.atStartOfDay();
-        if (ahora.isBefore(inicioReciboMesActual)) {
-            inicioReciboMesActual = inicioRecibo.minusMonths(1).atStartOfDay();
+
+        Optional<Factura> ultimaFacturaOpt = facturaRepository
+                .findTopByHogar_IdHogarAndServicios_ServiciosOrderByFechaPeriodoFinDesc(
+                        hogar.getIdHogar(), ServiciosEnum.AGUA);
+
+
+        LocalDateTime inicioRecibo;
+        if (ultimaFacturaOpt.isPresent()) {
+            Factura ultimaFactura = ultimaFacturaOpt.get();
+
+
+            LocalDate fechaFinAnterior = ultimaFactura.getFechaPeriodoFin();
+            if (fechaFinAnterior == null) {
+                LocalDateTime ahora = LocalDateTime.now();
+                LocalDate inicioBase = LocalDate.of(ahora.getYear(), ahora.getMonth(), 25);
+                inicioRecibo = inicioBase.atStartOfDay();
+                if (ahora.isBefore(inicioRecibo)) inicioRecibo = inicioBase.minusMonths(1).atStartOfDay();
+            } else {
+                inicioRecibo = fechaFinAnterior.plusDays(1).atStartOfDay();
+            }
+        } else {
+            LocalDateTime ahora = LocalDateTime.now();
+            LocalDate inicioBase = LocalDate.of(ahora.getYear(), ahora.getMonth(), 25);
+            inicioRecibo = inicioBase.atStartOfDay();
+            if (ahora.isBefore(inicioRecibo)) {
+                inicioRecibo = inicioBase.minusMonths(1).atStartOfDay();
+            }
         }
 
-        // 4. Calcular horas transcurridas desde inicio del recibo
-        long horasTranscurridas = ChronoUnit.HOURS.between(inicioReciboMesActual, ahora);
+        LocalDateTime ahora = LocalDateTime.now();
+        long horasTranscurridas = ChronoUnit.HOURS.between(inicioRecibo, ahora);
+        if (horasTranscurridas < 0) horasTranscurridas = 0;
 
         BigDecimal precioUnitario = tarifaAgua.getPreciounidad();
-        // 5. Calcular acumulado
         BigDecimal consumoAcumulado = consumoHora.multiply(BigDecimal.valueOf(horasTranscurridas));
         BigDecimal costoAcumulado = consumoAcumulado.multiply(precioUnitario);
 
@@ -182,7 +202,7 @@ public class AguaServiceimpl implements AguaService {
 
 
 
-    @Scheduled(cron = "0 0 0 * * *") // todos los días a medianoche
+    @Scheduled(cron = "0 0 0 * * *")
     public void guardarConsumoDiario() {
         System.out.println("🕒 Ejecutando guardarConsumoDiario a las: " + LocalDateTime.now());
         LocalDate hoy = LocalDate.now().minusDays(1); // día que terminó
@@ -202,11 +222,26 @@ public class AguaServiceimpl implements AguaService {
             Tarifa_Servicio tarifaAgua = precioTarifaRepository.findTarifaVigente(servicioAgua)
                     .orElseThrow(() -> new ValidationException("No existe tarifa vigente para Agua"));
 
+            Month mesActual = LocalDate.now().getMonth();
+            double factorMes = Estacionalidad.getFactor(mesActual);
+            BigDecimal factorMesBd = BigDecimal.valueOf(factorMes);
+
+
+            BigDecimal promedioAjustado = promedio.multiply(factorMesBd)
+                    .setScale(4, RoundingMode.HALF_UP);
+
+
+
+            double factorHogar = IntegrantesFamilia.calcularFactorHogar(hogar);
+            BigDecimal factorHogarBd = BigDecimal.valueOf(factorHogar);
+
+            BigDecimal promedioFinal = promedioAjustado.multiply(factorHogarBd)
+                    .setScale(4, RoundingMode.HALF_UP);
+
             int diasMes = hoy.lengthOfMonth();
-            BigDecimal consumoDiario = promedio.divide(BigDecimal.valueOf(diasMes), 4, RoundingMode.HALF_UP);
+            BigDecimal consumoDiario = promedioFinal.divide(BigDecimal.valueOf(diasMes), 4, RoundingMode.HALF_UP);
             BigDecimal precioUnitario = tarifaAgua.getPreciounidad();
             BigDecimal costoDiario = consumoDiario.multiply(precioUnitario);
-
 
 
             Consumo_Servicio consumo = new Consumo_Servicio();
@@ -216,37 +251,62 @@ public class AguaServiceimpl implements AguaService {
             consumo.setConsumo(consumoDiario);
             consumo.setCosto(costoDiario);
 
-            try {
-                consumoServicioRepository.save(consumo);
-                System.out.println("✅ Consumo guardado para hogar " + hogar.getIdHogar());
-            }catch (Exception e) {
-                e.printStackTrace();
-            }
-
         }
     }
 
-    // Se ejecuta cada día a la medianoche
+
     @Scheduled(cron = "0 0 0 * * *")
     public void cerrarFacturasMensuales() {
         LocalDate hoy = LocalDate.now();
 
-        // Ejemplo: verificamos si hoy es día 25
-        if (hoy.getDayOfMonth() == 25) {
-            // Aquí recorres los hogares y servicios
-            for (Hogar hogar : hogarRepository.findAll()) {
-                for (Servicios servicio : serviciosRepository.findAll()) {
+        List<Hogar> hogares = hogarRepository.findAll();
+        List<Servicios> servicios = serviciosRepository.findAll();
 
-                    // Definir periodo de la factura que acaba hoy
-                    LocalDate fechaInicio = hoy.minusMonths(1); // arranca el 25 del mes pasado
-                    LocalDate fechaFin = hoy;                   // termina hoy
+        for (Hogar hogar : hogares) {
+            for (Servicios servicio : servicios) {
 
-                    // Calcular consumo total (ejemplo: promedio * 30 días)
+
+                Optional<Factura> ultimaFacturaOpt = facturaRepository.findTopByHogar_IdHogarAndServicios_ServiciosOrderByFechaPeriodoFinDesc(
+                        hogar.getIdHogar(), servicio.getServicios());
+
+                if (ultimaFacturaOpt.isEmpty()) {
+                    System.out.println("No hay facturas previas para hogar " + hogar.getIdHogar() + " - servicio " + servicio.getServicios());
+                    continue;
+                }
+
+                Factura ultimaFactura = ultimaFacturaOpt.get();
+                LocalDate fechaInicio = ultimaFactura.getFechaPeriodoFin();
+                LocalDate fechaFinEsperada = fechaInicio.plusMonths(1);
+
+
+                if (!hoy.equals(fechaFinEsperada)) {
+                    continue; // aún no toca cerrar
+                }
+
+                System.out.println("🔒 Cerrando factura para hogar " + hogar.getIdHogar() + " - servicio " + servicio.getServicios());
                     BigDecimal consumoPromedio = facturaRepository.calcularPromedioConsumo(
                             hogar.getIdHogar(),
                             ServiciosEnum.AGUA);
                     if (consumoPromedio == null) consumoPromedio = BigDecimal.ZERO;// aquí usas tu lógica real
-                    BigDecimal consumoTotal = consumoPromedio.multiply(BigDecimal.valueOf(30));
+
+
+
+
+                    Month mesActual = LocalDate.now().getMonth();
+                    double factorMes = Estacionalidad.getFactor(mesActual);
+                    BigDecimal factorMesBd = BigDecimal.valueOf(factorMes);
+
+
+                    BigDecimal promedioAjustado = consumoPromedio.multiply(factorMesBd)
+                            .setScale(4, RoundingMode.HALF_UP);
+
+
+                    double factorHogar = IntegrantesFamilia.calcularFactorHogar(hogar);
+                    BigDecimal factorHogarBd = BigDecimal.valueOf(factorHogar);
+
+                    BigDecimal promedioFinal = promedioAjustado.multiply(factorHogarBd)
+                            .setScale(4, RoundingMode.HALF_UP);
+
 
                     Servicios servicioAgua = serviciosRepository.findByServicios(ServiciosEnum.AGUA)
                             .orElseThrow(() -> new ValidationException("Servicio Agua no encontrado"));
@@ -255,15 +315,23 @@ public class AguaServiceimpl implements AguaService {
                             .orElseThrow(() -> new ValidationException("No existe tarifa vigente para Agua"));
 
                     BigDecimal precioUnitario = tarifaAgua.getPreciounidad();
-                    // Calcular costo total
-                    BigDecimal costoTotal = consumoTotal.multiply(precioUnitario);
+                    BigDecimal costoTotal = promedioFinal.multiply(precioUnitario);
+
+
+                    Estrato_Agua estrato = hogar.getEstratoAgua();
+                    BigDecimal factorEstratoBd = BigDecimal.valueOf(1 + estrato.getFactor());
+
+                     BigDecimal costoFinal = costoTotal.multiply(factorEstratoBd)
+                          .setScale(2, RoundingMode.HALF_UP);
+
+
 
                     // Crear y guardar factura
                     Factura factura = new Factura();
                     factura.setFecha_periodoInicio(fechaInicio);
-                    factura.setFecha_periodoFin(fechaFin);
-                    factura.setConsumoTotal(consumoTotal);
-                    factura.setCosto_total(costoTotal);
+                    factura.setFechaPeriodoFin(fechaFinEsperada);
+                    factura.setConsumoTotal(promedioFinal);
+                    factura.setCosto_total(costoFinal);
                     factura.setHogar(hogar);
                     factura.setServicios(servicio);
 
@@ -272,4 +340,3 @@ public class AguaServiceimpl implements AguaService {
             }
         }
     }
-}

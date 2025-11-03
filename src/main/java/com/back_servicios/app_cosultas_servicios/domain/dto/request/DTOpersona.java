@@ -15,12 +15,11 @@ import lombok.Setter;
 public class DTOpersona {
 
     private String nombre;
-
-    private int edad;
-
     private String email;
+    private String telefono;
 
     private Categoria categoria;
+    private Boolean autorizado;
 
     private Long hogar_id;
 }

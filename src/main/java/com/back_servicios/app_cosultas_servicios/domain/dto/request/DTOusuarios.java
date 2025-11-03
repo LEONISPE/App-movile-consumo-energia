@@ -3,12 +3,6 @@ package com.back_servicios.app_cosultas_servicios.domain.dto.request;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-
 public record DTOusuarios(
 
 @NotBlank(message = "el nombre no puede estar en blanco")

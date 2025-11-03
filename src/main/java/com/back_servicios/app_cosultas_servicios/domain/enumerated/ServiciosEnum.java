@@ -4,5 +4,5 @@ public enum ServiciosEnum {
 
     AGUA,
     ENERGIA,
-    GAZ
+    GAS
 }

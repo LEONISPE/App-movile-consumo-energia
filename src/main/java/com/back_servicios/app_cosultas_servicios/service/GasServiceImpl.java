@@ -1,10 +1,12 @@
 package com.back_servicios.app_cosultas_servicios.service;
 
-import com.back_servicios.app_cosultas_servicios.domain.dto.response.ConsumoDTODiarioEnergia;
-import com.back_servicios.app_cosultas_servicios.domain.dto.response.DTOConsumoAcomuladoEnergia;
+import com.back_servicios.app_cosultas_servicios.domain.dto.response.ConsumoDTODiarioAgua;
+import com.back_servicios.app_cosultas_servicios.domain.dto.response.ConsumoDTODiarioGas;
+import com.back_servicios.app_cosultas_servicios.domain.dto.response.ConsumoDTOacomuladoGas;
+import com.back_servicios.app_cosultas_servicios.domain.dto.response.DTOconsumoAcomuladoAgua;
 import com.back_servicios.app_cosultas_servicios.domain.entity.*;
 import com.back_servicios.app_cosultas_servicios.domain.enumerated.Estrato_Agua;
-import com.back_servicios.app_cosultas_servicios.domain.enumerated.Estrato_Energia;
+import com.back_servicios.app_cosultas_servicios.domain.enumerated.Estrato_Gas;
 import com.back_servicios.app_cosultas_servicios.domain.enumerated.ServiciosEnum;
 import com.back_servicios.app_cosultas_servicios.exceptions.ValidationException;
 import com.back_servicios.app_cosultas_servicios.infra.FactoresConsumos.Estacionalidad;
@@ -30,87 +32,38 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-public class EnergiaServiceimpl  implements EnergiaService {
+public class GasServiceImpl implements GasService {
 
-    private final HogarRepository hogarRepository;
-    private final ServiciosRepository serviciosRepository;
+    private  final ServiciosRepository serviciosRepository;
+    private  final HogarRepository hogarRepository;
     private final PrecioTarifaRepository precioTarifaRepository;
-    private final FacturaRepository facturaRepository;
+    private  final FacturaRepository facturaRepository;
 
 
     @Override
-    public ConsumoDTODiarioEnergia calcularConsumoDiarioEnergia() {
+    public ConsumoDTODiarioGas calcularConsumoActual() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Usuarios principal = (Usuarios) auth.getPrincipal();
 
         Hogar hogar = hogarRepository.findByUsuarioIdUsuario(principal.getIdUsuario())
                 .orElseThrow(() -> new ValidationException("Hogar no encontrado"));
 
-        Servicios servicioEnergia = serviciosRepository.findByServicios(ServiciosEnum.ENERGIA)
-                .orElseThrow(() -> new ValidationException("Servicio de energia no encontrado"));
+        Servicios servicioGas = serviciosRepository.findByServicios(ServiciosEnum.GAS)
+                .orElseThrow(() -> new ValidationException("Servicio Gas no encontrado"));
 
 
-        Tarifa_Servicio tarifaEnergia = precioTarifaRepository.findTarifaVigente(servicioEnergia)
-                .orElseThrow(() -> new ValidationException("No existe tarifa vigente para Energia"));
+        Tarifa_Servicio tarifaGas = precioTarifaRepository.findTarifaVigente(servicioGas)
+                .orElseThrow(() -> new ValidationException("No existe tarifa vigente para Gas"));
+
 
         BigDecimal promedio = facturaRepository.calcularPromedioConsumo(
                 hogar.getIdHogar(),
-                ServiciosEnum.ENERGIA);
-        if (promedio == null) promedio = BigDecimal.ZERO;
-
-
-        Month mesActual = LocalDate.now().getMonth();
-        double factorMes = Estacionalidad.getFactor(mesActual);   // ej. 1.20, 0.95, etc.
-        BigDecimal factorMesBd = BigDecimal.valueOf(factorMes);
-
-
-        BigDecimal promedioAjustado = promedio.multiply(factorMesBd)
-                .setScale(4, RoundingMode.HALF_UP);
-
-        double factorHogar = IntegrantesFamilia.calcularFactorHogar(hogar);
-        BigDecimal factorHogarBd = BigDecimal.valueOf(factorHogar);
-
-        BigDecimal promedioFinal = promedioAjustado.multiply(factorHogarBd)
-                .setScale(4, RoundingMode.HALF_UP);
-
-        int diasMes = LocalDate.now().lengthOfMonth();
-        BigDecimal consumoDiario = promedioFinal.divide(BigDecimal.valueOf(diasMes), 4, RoundingMode.HALF_UP);
-        BigDecimal consumoHora = consumoDiario.divide(BigDecimal.valueOf(24), 4, RoundingMode.HALF_UP);
-
-        int horasTranscurridas = LocalDateTime.now().getHour(); // 0-23
-        BigDecimal consumoActualHoy = consumoHora.multiply(BigDecimal.valueOf(horasTranscurridas));
-
-        BigDecimal precioUnitario = tarifaEnergia.getPreciounidad();
-
-
-        BigDecimal costoActualHoy = consumoActualHoy.multiply(precioUnitario);
-
-        return new ConsumoDTODiarioEnergia(
-                consumoActualHoy,
-                costoActualHoy,
-                consumoHora
+                ServiciosEnum.GAS
         );
-    }
-
-    @Override
-    public DTOConsumoAcomuladoEnergia ObtenerConsumoAcomuladoEnergia() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Usuarios principal = (Usuarios) auth.getPrincipal();
-
-        Hogar hogar = hogarRepository.findByUsuarioIdUsuario(principal.getIdUsuario())
-                .orElseThrow(() -> new ValidationException("Hogar no encontrado"));
-
-        Servicios servicioEnergia = serviciosRepository.findByServicios(ServiciosEnum.AGUA)
-                .orElseThrow(() -> new ValidationException("Servicio de energia no encontrado"));
-
-
-        Tarifa_Servicio tarifaEnergia = precioTarifaRepository.findTarifaVigente(servicioEnergia)
-                .orElseThrow(() -> new ValidationException("No existe tarifa vigente para Energia"));
-
-        BigDecimal promedio = facturaRepository.calcularPromedioConsumo(
-                hogar.getIdHogar(),
-                ServiciosEnum.ENERGIA);
         if (promedio == null) promedio = BigDecimal.ZERO;
+        System.out.println("el promedio de esas facturas es "+ promedio);
+
+
 
         Month mesActual = LocalDate.now().getMonth();
         double factorMes = Estacionalidad.getFactor(mesActual);
@@ -120,11 +73,80 @@ public class EnergiaServiceimpl  implements EnergiaService {
         BigDecimal promedioAjustado = promedio.multiply(factorMesBd)
                 .setScale(4, RoundingMode.HALF_UP);
 
+
+
         double factorHogar = IntegrantesFamilia.calcularFactorHogar(hogar);
         BigDecimal factorHogarBd = BigDecimal.valueOf(factorHogar);
 
         BigDecimal promedioFinal = promedioAjustado.multiply(factorHogarBd)
                 .setScale(4, RoundingMode.HALF_UP);
+
+
+
+
+
+        int diasMes = LocalDate.now().lengthOfMonth();
+        BigDecimal consumoDiario = promedioFinal.divide(BigDecimal.valueOf(diasMes), 6, RoundingMode.HALF_UP);
+        BigDecimal consumoHora = consumoDiario.divide(BigDecimal.valueOf(24), 6, RoundingMode.HALF_UP);
+
+
+        int horasTranscurridas = LocalDateTime.now().getHour();
+        BigDecimal consumoActualHoy = consumoHora.multiply(BigDecimal.valueOf(horasTranscurridas))
+                .setScale(6, RoundingMode.HALF_UP);
+
+
+        BigDecimal precioUnitario = tarifaGas.getPreciounidad();
+        BigDecimal costoBase = consumoActualHoy.multiply(precioUnitario)
+                .setScale(2, RoundingMode.HALF_UP);
+
+
+
+
+        return new ConsumoDTODiarioGas(
+                consumoActualHoy,
+                costoBase,
+                consumoHora
+        );
+    }
+    @Override
+    public ConsumoDTOacomuladoGas obtenerConsumoAcomulado() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Usuarios principal = (Usuarios) auth.getPrincipal();
+        Hogar hogar = hogarRepository.findByUsuarioIdUsuario(principal.getIdUsuario())
+                .orElseThrow(() -> new ValidationException("Hogar no encontrado"));
+
+        Servicios servicioGas = serviciosRepository.findByServicios(ServiciosEnum.GAS)
+                .orElseThrow(() -> new ValidationException("Servicio Gas no encontrado"));
+
+
+        Tarifa_Servicio tarifaGas = precioTarifaRepository.findTarifaVigente(servicioGas)
+                .orElseThrow(() -> new ValidationException("No existe tarifa vigente para Gas"));
+
+
+
+        BigDecimal promedio = facturaRepository.calcularPromedioConsumo(
+                hogar.getIdHogar(),
+                ServiciosEnum.GAS
+        );
+        if (promedio == null) promedio = BigDecimal.ZERO;
+
+
+        Month mesActual = LocalDate.now().getMonth();
+        double factorMes = Estacionalidad.getFactor(mesActual);
+        BigDecimal factorMesBd = BigDecimal.valueOf(factorMes);
+
+
+        BigDecimal promedioAjustado = promedio.multiply(factorMesBd)
+                .setScale(4, RoundingMode.HALF_UP);
+
+
+
+        double factorHogar = IntegrantesFamilia.calcularFactorHogar(hogar);
+        BigDecimal factorHogarBd = BigDecimal.valueOf(factorHogar);
+
+        BigDecimal promedioFinal = promedioAjustado.multiply(factorHogarBd)
+                .setScale(4, RoundingMode.HALF_UP);
+
 
         int diasMes = LocalDate.now().lengthOfMonth();
         BigDecimal consumoDiario = promedioFinal.divide(BigDecimal.valueOf(diasMes), 4, RoundingMode.HALF_UP);
@@ -133,7 +155,7 @@ public class EnergiaServiceimpl  implements EnergiaService {
 
         Optional<Factura> ultimaFacturaOpt = facturaRepository
                 .findTopByHogar_IdHogarAndServicios_ServiciosOrderByFechaPeriodoFinDesc(
-                        hogar.getIdHogar(), ServiciosEnum.ENERGIA);
+                        hogar.getIdHogar(), ServiciosEnum.GAS);
 
 
         LocalDateTime inicioRecibo;
@@ -148,6 +170,7 @@ public class EnergiaServiceimpl  implements EnergiaService {
                 inicioRecibo = inicioBase.atStartOfDay();
                 if (ahora.isBefore(inicioRecibo)) inicioRecibo = inicioBase.minusMonths(1).atStartOfDay();
             } else {
+
                 inicioRecibo = fechaFinAnterior.plusDays(1).atStartOfDay();
             }
         } else {
@@ -158,21 +181,26 @@ public class EnergiaServiceimpl  implements EnergiaService {
                 inicioRecibo = inicioBase.minusMonths(1).atStartOfDay();
             }
         }
+
         LocalDateTime ahora = LocalDateTime.now();
         long horasTranscurridas = ChronoUnit.HOURS.between(inicioRecibo, ahora);
         if (horasTranscurridas < 0) horasTranscurridas = 0;
 
-        BigDecimal precioUnitario = tarifaEnergia.getPreciounidad();
+
+        BigDecimal precioUnitario = tarifaGas.getPreciounidad();
         BigDecimal consumoAcumulado = consumoHora.multiply(BigDecimal.valueOf(horasTranscurridas));
         BigDecimal costoAcumulado = consumoAcumulado.multiply(precioUnitario);
 
-        DTOConsumoAcomuladoEnergia dto = new DTOConsumoAcomuladoEnergia();
+
+        ConsumoDTOacomuladoGas dto = new ConsumoDTOacomuladoGas();
         dto.setConsumoAcomulado(consumoAcumulado);
         dto.setCostoAcomulado(costoAcumulado);
 
         return dto;
-
     }
+
+
+
 
     @Scheduled(cron = "0 0 0 * * *")
     public void guardarConsumoDiario() {
@@ -183,16 +211,16 @@ public class EnergiaServiceimpl  implements EnergiaService {
         for (Hogar hogar : hogares) {
             BigDecimal promedio = facturaRepository.calcularPromedioConsumo(
                     hogar.getIdHogar(),
-                    ServiciosEnum.ENERGIA
+                    ServiciosEnum.GAS
             );
             if (promedio == null) promedio = BigDecimal.ZERO;
             System.out.println("Promedio hogar " + hogar.getIdHogar() + ": " + promedio);
 
-            Servicios servicioEnergia = serviciosRepository.findByServicios(ServiciosEnum.ENERGIA)
-                    .orElseThrow(() -> new ValidationException("Servicio Energia no encontrado"));
+            Servicios servicioGas = serviciosRepository.findByServicios(ServiciosEnum.GAS)
+                    .orElseThrow(() -> new ValidationException("Servicio Gas no encontrado"));
 
-            Tarifa_Servicio tarifaEnergia = precioTarifaRepository.findTarifaVigente(servicioEnergia)
-                    .orElseThrow(() -> new ValidationException("No existe tarifa vigente para Energia"));
+            Tarifa_Servicio tarifaGas = precioTarifaRepository.findTarifaVigente(servicioGas)
+                    .orElseThrow(() -> new ValidationException("No existe tarifa vigente para Gas"));
 
             Month mesActual = LocalDate.now().getMonth();
             double factorMes = Estacionalidad.getFactor(mesActual);
@@ -212,19 +240,20 @@ public class EnergiaServiceimpl  implements EnergiaService {
 
             int diasMes = hoy.lengthOfMonth();
             BigDecimal consumoDiario = promedioFinal.divide(BigDecimal.valueOf(diasMes), 4, RoundingMode.HALF_UP);
-            BigDecimal precioUnitario = tarifaEnergia.getPreciounidad();
+            BigDecimal precioUnitario = tarifaGas.getPreciounidad();
             BigDecimal costoDiario = consumoDiario.multiply(precioUnitario);
 
 
             Consumo_Servicio consumo = new Consumo_Servicio();
             consumo.setHogar(hogar);
-            consumo.setServicios(servicioEnergia);
+            consumo.setServicios(servicioGas);
             consumo.setFecha(hoy);
             consumo.setConsumo(consumoDiario);
             consumo.setCosto(costoDiario);
 
         }
     }
+
 
     @Scheduled(cron = "0 0 0 * * *")
     public void cerrarFacturasMensuales() {
@@ -257,8 +286,8 @@ public class EnergiaServiceimpl  implements EnergiaService {
                 System.out.println("🔒 Cerrando factura para hogar " + hogar.getIdHogar() + " - servicio " + servicio.getServicios());
                 BigDecimal consumoPromedio = facturaRepository.calcularPromedioConsumo(
                         hogar.getIdHogar(),
-                        ServiciosEnum.ENERGIA);
-                if (consumoPromedio == null) consumoPromedio = BigDecimal.ZERO;// aquí usas tu lógica real
+                        ServiciosEnum.GAS);
+                if (consumoPromedio == null) consumoPromedio = BigDecimal.ZERO;
 
 
 
@@ -280,18 +309,18 @@ public class EnergiaServiceimpl  implements EnergiaService {
                         .setScale(4, RoundingMode.HALF_UP);
 
 
-                Servicios servicioEnergia = serviciosRepository.findByServicios(ServiciosEnum.ENERGIA)
-                        .orElseThrow(() -> new ValidationException("Servicio Energia no encontrado"));
+                Servicios servicioGas = serviciosRepository.findByServicios(ServiciosEnum.GAS)
+                        .orElseThrow(() -> new ValidationException("Servicio Gas no encontrado"));
 
-                Tarifa_Servicio tarifaAgua = precioTarifaRepository.findTarifaVigente(servicioEnergia)
-                        .orElseThrow(() -> new ValidationException("No existe tarifa vigente para Energia"));
+                Tarifa_Servicio tarifaGas = precioTarifaRepository.findTarifaVigente(servicioGas)
+                        .orElseThrow(() -> new ValidationException("No existe tarifa vigente para Gas"));
 
-                BigDecimal precioUnitario = tarifaAgua.getPreciounidad();
+                BigDecimal precioUnitario = tarifaGas.getPreciounidad();
                 BigDecimal costoTotal = promedioFinal.multiply(precioUnitario);
 
 
 
-                Estrato_Energia estrato = hogar.getEstratoEnergia();
+                Estrato_Gas estrato = hogar.getEstratoGas();
                 BigDecimal factorEstratoBd = BigDecimal.valueOf(1 + estrato.getFactor());
 
                 BigDecimal costoFinal = costoTotal.multiply(factorEstratoBd)
@@ -312,4 +341,6 @@ public class EnergiaServiceimpl  implements EnergiaService {
             }
         }
     }
+
+
 }

@@ -33,7 +33,7 @@ public class PrecioTarifaController {
     )
     @PutMapping("/registrar/tarifa")
     public ResponseEntity<DTOprecioTarifa> crearprecioTarifa(@RequestBody @Valid DTOprecioTarifa DTOprecioTarifa) {
-        DTOprecioTarifa dtoprecioRespuesta = tarifaServicio.crearTarifaAgua(DTOprecioTarifa);
+        DTOprecioTarifa dtoprecioRespuesta = tarifaServicio.crearTarifa(DTOprecioTarifa);
         return ResponseEntity.ok(dtoprecioRespuesta);
 
     }

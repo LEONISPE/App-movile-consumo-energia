@@ -1,7 +1,9 @@
 package com.back_servicios.app_cosultas_servicios.domain.dto.request;
 
 import com.back_servicios.app_cosultas_servicios.domain.enumerated.Ciudad;
-import com.back_servicios.app_cosultas_servicios.domain.enumerated.Estrato;
+import com.back_servicios.app_cosultas_servicios.domain.enumerated.Estrato_Agua;
+import com.back_servicios.app_cosultas_servicios.domain.enumerated.Estrato_Energia;
+import com.back_servicios.app_cosultas_servicios.domain.enumerated.Estrato_Gas;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,7 +18,9 @@ public class DTOhogar {
     private String calle;
     private String carrera;
     private Ciudad ciudad;
-    private Estrato estrato;
+    private Estrato_Agua estratoAgua;
+    private Estrato_Energia estratoEnergia;
+    private Estrato_Gas estratoGas;
     private int numeroIntegrantesOriginal;
     private double sumaFactoresOriginales;
 

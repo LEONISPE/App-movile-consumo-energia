@@ -1,6 +1,6 @@
 package com.back_servicios.app_cosultas_servicios.domain.enumerated;
 
-public enum Estrato {
+public enum Estrato_Agua {
         ESTRATO_1(-0.70), // subsidio 70%
         ESTRATO_2(-0.40), // subsidio 40%
         ESTRATO_3(-0.15), // subsidio 15%
@@ -10,7 +10,7 @@ public enum Estrato {
 
         private final double factor;
 
-        Estrato(double factor) {
+        Estrato_Agua(double factor) {
             this.factor = factor;
         }
 

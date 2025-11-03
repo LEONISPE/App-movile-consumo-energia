@@ -22,19 +22,20 @@ public class TokenService {
 
     public String generateToken(Usuarios user) {
         try {
-            Algorithm algorithm = Algorithm.HMAC256(apiSecret); //secreto para validar firma
-            return JWT.create().withIssuer("App")
-                    .withSubject(user.getEmail())
+            Algorithm algorithm = Algorithm.HMAC256(apiSecret);
+            return JWT.create()
+                    .withIssuer("App")
+                    .withSubject(user.getEmail()) // Solo un subject: el email
                     .withClaim("id", user.getIdUsuario())
-                    .withClaim("role", user.getRole().name()) // Single role
+                    .withClaim("nombres", user.getNombres())
+                    .withClaim("role", user.getRole().name())
                     .withExpiresAt(generateExpiryDate())
-                    .sign(algorithm); //string
+                    .sign(algorithm);
         } catch (JWTCreationException e) {
-            System.out.println(e.getMessage());
-            throw new RuntimeException();
+            System.out.println("Error creando token: " + e.getMessage());
+            throw new RuntimeException(e);
         }
     }
-
     private Instant generateExpiryDate() {
         ZoneId zone = ZoneId.systemDefault();  // Obtener la zona horaria del sistema
         return LocalDateTime.now(zone).plusMinutes(60)

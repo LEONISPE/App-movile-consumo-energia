@@ -20,7 +20,7 @@ public class TarifaServicio {
     private PrecioTarifaRepository precioTarifaRepository;
     private ServiciosRepository serviciosRepository;
 
-    public DTOprecioTarifa crearTarifaAgua(DTOprecioTarifa dtoprecioTarifa) {
+    public DTOprecioTarifa crearTarifa(DTOprecioTarifa dtoprecioTarifa) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Usuarios Auth = (Usuarios) authentication.getPrincipal();
@@ -28,19 +28,19 @@ public class TarifaServicio {
         if(Auth.getRole() != Role.ADMIN){
             throw new ValidationException("El usuario no tiene role administrador");
         }
-        // buscamos el servicio "Agua" (supongamos que ya existe en la BD con id = 1)
+
         Servicios servicio = serviciosRepository.findById(dtoprecioTarifa.getServicio_id())
-                .orElseThrow(() -> new ValidationException("Servicio Agua no encontrado"));
+                .orElseThrow(() -> new ValidationException("Servicio  no encontrado"));
 
 
-        // creamos una nueva tarifa
+
         Tarifa_Servicio nuevaTarifa = new Tarifa_Servicio();
         nuevaTarifa.setPreciounidad(dtoprecioTarifa.getPreciounidad());
         nuevaTarifa.setFechaInicio(dtoprecioTarifa.getFechaInicio());
         nuevaTarifa.setFechaFin(dtoprecioTarifa.getFechaFin());
         nuevaTarifa.setServicios(servicio);
 
-        // guardamos en la BD
+
         precioTarifaRepository.save(nuevaTarifa);
 
         return dtoprecioTarifa;

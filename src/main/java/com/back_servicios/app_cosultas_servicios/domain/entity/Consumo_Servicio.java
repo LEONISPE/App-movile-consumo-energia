@@ -20,6 +20,7 @@ public class Consumo_Servicio {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_consumo")
     private Long idConsumo;
 
     @ManyToOne

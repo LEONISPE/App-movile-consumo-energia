@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface HogarRepository extends JpaRepository<Hogar, Long> {
     Optional<Hogar> findByUsuarioIdUsuario(Long idUsuario);
+
 }

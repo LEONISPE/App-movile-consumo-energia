@@ -2,6 +2,7 @@ package com.back_servicios.app_cosultas_servicios.domain.entity;
 
 import com.back_servicios.app_cosultas_servicios.domain.enumerated.ServiciosEnum;
 import com.back_servicios.app_cosultas_servicios.domain.enumerated.Unidad;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,15 +23,20 @@ public class Servicios {
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
    @Enumerated(EnumType.STRING)
-    private ServiciosEnum  servicios;
+   private ServiciosEnum  servicios;
+
+
    @Enumerated(EnumType.STRING)
     private Unidad unidad;
 
     @OneToMany(mappedBy = "servicios", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<Tarifa_Servicio> tarifas = new ArrayList<>();
 
     @OneToMany(mappedBy = "servicios")
+    @JsonManagedReference
     private List<Factura> facturas;
 
     @OneToMany(mappedBy = "servicios")

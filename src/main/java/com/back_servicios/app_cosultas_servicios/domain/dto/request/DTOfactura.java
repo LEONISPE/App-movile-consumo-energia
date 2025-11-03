@@ -15,7 +15,7 @@ import java.time.LocalDate;
 public class DTOfactura {
 
     private LocalDate fecha_periodoInicio;
-    private LocalDate fecha_periodoFin;
+    private LocalDate fechaPeriodoFin;
     private BigDecimal consumoTotal;
     private Long hogar_id;
     private Long servicio_id;
