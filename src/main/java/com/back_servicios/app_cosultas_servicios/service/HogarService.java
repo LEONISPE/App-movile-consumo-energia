@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface HogarService {
 
-    DTOhogar createHogar(DTOhogar dtohogar, Long idUsuario);
-    List<DTOmiebrosHogar> obtenerMiembrosDelHogar(Long id_hogar);
+    DTOhogar createHogar(DTOhogar dtohogar);
+    List<DTOmiebrosHogar> obtenerMiembrosDelHogar();
 }

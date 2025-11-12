@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:App/config/api_config.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -8,7 +9,7 @@ class LoginService {
 static String? token;
 
 Future<http.Response> login(String email, String password) async {
-    final url = Uri.parse('http://localhost:8080/login');
+    final url = Uri.parse('${ApiConfig.baseUrl}/login');
 
     final body = jsonEncode({
       'email': email,

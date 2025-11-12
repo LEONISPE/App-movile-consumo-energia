@@ -1,11 +1,10 @@
 package com.back_servicios.app_cosultas_servicios.service;
 
-import com.back_servicios.app_cosultas_servicios.domain.dto.response.ConsumoDTODiarioAgua;
 import com.back_servicios.app_cosultas_servicios.domain.dto.response.ConsumoDTODiarioGas;
 import com.back_servicios.app_cosultas_servicios.domain.dto.response.ConsumoDTOacomuladoGas;
-import com.back_servicios.app_cosultas_servicios.domain.dto.response.DTOconsumoAcomuladoAgua;
+
 import com.back_servicios.app_cosultas_servicios.domain.entity.*;
-import com.back_servicios.app_cosultas_servicios.domain.enumerated.Estrato_Agua;
+
 import com.back_servicios.app_cosultas_servicios.domain.enumerated.Estrato_Gas;
 import com.back_servicios.app_cosultas_servicios.domain.enumerated.ServiciosEnum;
 import com.back_servicios.app_cosultas_servicios.exceptions.ValidationException;
@@ -45,7 +44,7 @@ public class GasServiceImpl implements GasService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Usuarios principal = (Usuarios) auth.getPrincipal();
 
-        Hogar hogar = hogarRepository.findByUsuarioIdUsuario(principal.getIdUsuario())
+        Hogar hogar = hogarRepository.findByUsuarios_IdUsuario(principal.getIdUsuario())
                 .orElseThrow(() -> new ValidationException("Hogar no encontrado"));
 
         Servicios servicioGas = serviciosRepository.findByServicios(ServiciosEnum.GAS)
@@ -112,7 +111,7 @@ public class GasServiceImpl implements GasService {
     public ConsumoDTOacomuladoGas obtenerConsumoAcomulado() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Usuarios principal = (Usuarios) auth.getPrincipal();
-        Hogar hogar = hogarRepository.findByUsuarioIdUsuario(principal.getIdUsuario())
+        Hogar hogar = hogarRepository.findByUsuarios_IdUsuario(principal.getIdUsuario())
                 .orElseThrow(() -> new ValidationException("Hogar no encontrado"));
 
         Servicios servicioGas = serviciosRepository.findByServicios(ServiciosEnum.GAS)

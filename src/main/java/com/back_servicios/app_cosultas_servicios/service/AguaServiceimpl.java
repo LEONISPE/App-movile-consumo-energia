@@ -41,7 +41,7 @@ public class AguaServiceimpl implements AguaService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Usuarios principal = (Usuarios) auth.getPrincipal();
 
-        Hogar hogar = hogarRepository.findByUsuarioIdUsuario(principal.getIdUsuario())
+        Hogar hogar = hogarRepository.findByUsuarios_IdUsuario(principal.getIdUsuario())
                 .orElseThrow(() -> new ValidationException("Hogar no encontrado"));
 
         Servicios servicioAgua = serviciosRepository.findByServicios(ServiciosEnum.AGUA)
@@ -114,7 +114,7 @@ public class AguaServiceimpl implements AguaService {
     public DTOconsumoAcomuladoAgua obtenerConsumoAcomulado() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Usuarios principal = (Usuarios) auth.getPrincipal();
-        Hogar hogar = hogarRepository.findByUsuarioIdUsuario(principal.getIdUsuario())
+        Hogar hogar = hogarRepository.findByUsuarios_IdUsuario(principal.getIdUsuario())
                 .orElseThrow(() -> new ValidationException("Hogar no encontrado"));
 
         Servicios servicioAgua = serviciosRepository.findByServicios(ServiciosEnum.AGUA)

@@ -17,18 +17,17 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/login")
 public class AutenticacionController {
 
-  private final TokenService tokenService;
-  private final AuthenticationManager authenticationManager;
+    private final TokenService tokenService;
+    private final AuthenticationManager authenticationManager;
+
 
     @PostMapping
-    public ResponseEntity authenticateUser(@RequestBody @Valid UsuarioAutenticacionDTO userAuthenticationDTO)
-    {
+    public ResponseEntity authenticateUser(@RequestBody @Valid UsuarioAutenticacionDTO usuarioAutenticacionDTO) {
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                userAuthenticationDTO.email(), userAuthenticationDTO.password()
+                usuarioAutenticacionDTO.email(), usuarioAutenticacionDTO.password()
         );
         var authenticatedUser = authenticationManager.authenticate(authToken);
         var jwToken = tokenService.generateToken((Usuarios) authenticatedUser.getPrincipal());
         return ResponseEntity.ok(new DataJwToken(jwToken));
     }
 }
-

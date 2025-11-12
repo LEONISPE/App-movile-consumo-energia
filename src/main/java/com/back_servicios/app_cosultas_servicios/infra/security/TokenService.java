@@ -7,6 +7,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.back_servicios.app_cosultas_servicios.domain.entity.Usuarios;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -22,20 +23,19 @@ public class TokenService {
 
     public String generateToken(Usuarios user) {
         try {
-            Algorithm algorithm = Algorithm.HMAC256(apiSecret);
-            return JWT.create()
-                    .withIssuer("App")
-                    .withSubject(user.getEmail()) // Solo un subject: el email
+            Algorithm algorithm = Algorithm.HMAC256(apiSecret); //secreto para validar firma
+            return JWT.create().withIssuer("Back")
+                    .withSubject(user.getEmail())
                     .withClaim("id", user.getIdUsuario())
-                    .withClaim("nombres", user.getNombres())
-                    .withClaim("role", user.getRole().name())
+                    .withClaim("role", user.getRole().name()) // Single role
                     .withExpiresAt(generateExpiryDate())
-                    .sign(algorithm);
+                    .sign(algorithm); //string
         } catch (JWTCreationException e) {
-            System.out.println("Error creando token: " + e.getMessage());
-            throw new RuntimeException(e);
+            System.out.println(e.getMessage());
+            throw new RuntimeException();
         }
     }
+
     private Instant generateExpiryDate() {
         ZoneId zone = ZoneId.systemDefault();  // Obtener la zona horaria del sistema
         return LocalDateTime.now(zone).plusMinutes(60)
@@ -49,7 +49,7 @@ public class TokenService {
         DecodedJWT verifier = null;
         try {
             Algorithm algorithm = Algorithm.HMAC256(apiSecret);
-            verifier = JWT.require(algorithm).withIssuer("App").build().verify(token);
+            verifier = JWT.require(algorithm).withIssuer("Back").build().verify(token);
             verifier.getSubject();
         } catch (JWTVerificationException exception) {
             System.out.println(exception.getMessage());
@@ -69,7 +69,7 @@ public class TokenService {
         try {
             Algorithm algorithm = Algorithm.HMAC256(apiSecret);
             DecodedJWT verifier = JWT.require(algorithm)
-                    .withIssuer("App")
+                    .withIssuer("Back")
                     .build()
                     .verify(token);
 
@@ -109,7 +109,7 @@ public class TokenService {
         try {
             Algorithm algorithm = Algorithm.HMAC256(apiSecret);
             return JWT.require(algorithm)
-                    .withIssuer("App")
+                    .withIssuer("Back")
                     .build()
                     .verify(token);
         } catch (JWTVerificationException exception) {

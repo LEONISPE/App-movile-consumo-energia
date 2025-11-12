@@ -3,7 +3,6 @@ package com.back_servicios.app_cosultas_servicios.controller;
 import com.back_servicios.app_cosultas_servicios.domain.dto.request.DTOhogar;
 import com.back_servicios.app_cosultas_servicios.domain.dto.request.DTOusuarios;
 import com.back_servicios.app_cosultas_servicios.domain.dto.response.DTOmiebrosHogar;
-import com.back_servicios.app_cosultas_servicios.domain.entity.Persona;
 import com.back_servicios.app_cosultas_servicios.domain.enumerated.Role;
 import com.back_servicios.app_cosultas_servicios.service.HogarService;
 import io.swagger.v3.oas.annotations.Operation;

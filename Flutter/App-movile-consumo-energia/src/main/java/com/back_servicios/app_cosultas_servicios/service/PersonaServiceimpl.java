@@ -4,13 +4,10 @@ import com.back_servicios.app_cosultas_servicios.domain.dto.request.DTOEmailMieb
 import com.back_servicios.app_cosultas_servicios.domain.dto.request.DTOPasswordMiebro;
 import com.back_servicios.app_cosultas_servicios.domain.dto.request.DTOpersona;
 import com.back_servicios.app_cosultas_servicios.domain.entity.Hogar;
-import com.back_servicios.app_cosultas_servicios.domain.entity.Persona;
 import com.back_servicios.app_cosultas_servicios.domain.entity.Usuarios;
 import com.back_servicios.app_cosultas_servicios.domain.enumerated.Role;
-import com.back_servicios.app_cosultas_servicios.domain.mapper.request.PersonaCreateMapper;
 import com.back_servicios.app_cosultas_servicios.exceptions.ValidationException;
 import com.back_servicios.app_cosultas_servicios.repository.HogarRepository;
-import com.back_servicios.app_cosultas_servicios.repository.PersonaRepository;
 import com.back_servicios.app_cosultas_servicios.repository.UsuarioRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;

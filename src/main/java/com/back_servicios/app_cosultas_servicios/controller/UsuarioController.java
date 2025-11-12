@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.hibernate.annotations.Parameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,14 +39,25 @@ public class UsuarioController {
             summary = "Registrar usuario",
             description = "Permite registrar un nuevo usuario con rol por defecto de dueño."
     )
-    @PostMapping("/registrar/usuario")
-    public ResponseEntity<DTOusuarios> crearusuario(@RequestBody @Valid DTOusuarios dtOusuarios){
-       DTOusuarios dtOusuarios1 = usuarioService.crearUsuarios(dtOusuarios);
+    @PostMapping("/registrar/usuario/{id_hogar}")
+    public ResponseEntity<DTOusuarios> crearusuario(@RequestBody @Valid DTOusuarios dtOusuarios,@PathVariable Long id_hogar) {
+       DTOusuarios dtOusuarios1 = usuarioService.crearUsuarios(dtOusuarios, id_hogar);
          return ResponseEntity.ok(dtOusuarios1);
 
     }
-
     @Operation(
+            summary = "Registrar Miembro",
+            description = "Permite registrar un miembro a un hohar."
+    )
+    @PostMapping("/registrar/miembro")
+    public ResponseEntity<DTOMiembro> crearMiembro(@RequestBody @Valid DTOMiembro dtoMiembro) {
+        DTOMiembro dtoMiembro1 = usuarioService.crearMiembrosHogar(dtoMiembro);
+        return ResponseEntity.ok(dtoMiembro1);
+    }
+
+
+
+        @Operation(
             summary = "actualizar usuario",
             description = "Permite actulizar un usuario existente."
     )
@@ -67,16 +79,7 @@ public class UsuarioController {
             return ResponseEntity.ok(dtOusuariosResponse);
 
     }
-    @Operation(
-            summary = "Autorizar miebro",
-            description = "Permite Autorizar miembros del hogar a ver el consumo."
-    )
-    @PutMapping("/Autorizar/miembro/{id}")
-    public ResponseEntity<String> auctorizarMiebro(@PathVariable Long id){
-        usuarioService.AutorizarMiembro(id);
-        return ResponseEntity.ok("Miembro Auctorizado correctamente");
 
-    }
     @Operation(
             summary = "Setear email de miembro",
             description = "Permite Setarle un email a el miembro."
@@ -87,6 +90,31 @@ public class UsuarioController {
         return ResponseEntity.ok(dtoEmailMiebro);
 
     }
+
+    @Operation(
+            summary = "Comprobar email de miembro",
+            description = "Permite Comprobar el  email a el miembro."
+    )
+    @PostMapping("/comprobar/email/miembros")
+    public ResponseEntity<DTOEmailMiebro> ComprobarEmailMiembro(@RequestBody DTOEmailMiebro dtoEmailMiebro){
+        usuarioService.ComprobarEmailMiebro(dtoEmailMiebro);
+        return ResponseEntity.ok(dtoEmailMiebro);
+
+    }
+    @Operation(
+            summary = "Setear password de miembro",
+            description = "Permite Setarle  el  Password a el miembro."
+    )
+    @PostMapping("/miembro/set-password")
+    public ResponseEntity<String> actualizarPasswordMiembro(
+            @RequestParam String email,
+            @RequestBody DTOPasswordMiebro dto) {
+
+        usuarioService.setearPasswordMiembro(dto, email);
+        return ResponseEntity.ok("Contraseña actualizada correctamente.");
+    }
+
+
     @Operation(
             summary = "actualizar contraseña del usuario o miembro",
             description = "Permite actualizar contraseña ."

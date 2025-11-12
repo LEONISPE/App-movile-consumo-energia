@@ -1,8 +1,7 @@
 import 'dart:async';
+import 'package:App/services/PerfilService.dart';
+import 'package:App/services/UsuarioService.dart';
 import 'package:flutter/material.dart';
-import 'package:hello_world/services/PerfilService.dart';
-import 'package:hello_world/services/UsuarioService.dart'; 
-
 class Perfilscreen extends StatefulWidget {
   static String routeName = '/perfil-screen';
 

@@ -20,6 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
+@Table(name = "usuarios")
 public class Usuarios  implements UserDetails {
 
     @Id
@@ -27,23 +28,30 @@ public class Usuarios  implements UserDetails {
     @Column(name = "id_usuario")
     private Long idUsuario;
     private String nombres;
+    private int edad;
     private String apellidos;
     private String email;
     private String telefono;
     private String password;
     @Enumerated(EnumType.STRING)
-    private Role role  = Role.DUEÑO;
+    private Role role;
     @Enumerated(EnumType.STRING)
-    private Categoria categoria = Categoria.ADULTO;
+    private Categoria categoria;
 
-    @OneToOne(mappedBy = "usuario")
+    private Boolean autorizado;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "hogar_id")
     @JsonBackReference
     private Hogar hogar;
 
    @Override
    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_DUEÑO"));
-    }
+       if (role == null) {
+           return List.of(); // No tiene rol → no tendrá permisos especiales
+       }
+       return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+   }
 
     @Override
     public String getPassword() {

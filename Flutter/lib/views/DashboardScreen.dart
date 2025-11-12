@@ -1,12 +1,13 @@
 import 'dart:async';
+import 'package:App/services/LoginService.dart';
+import 'package:App/services/UsuarioService.dart';
+import 'package:App/views/FacturaScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
-import 'package:hello_world/services/LoginService.dart';
-import 'package:hello_world/services/UsuarioService.dart';
 
 class DashboardScreen extends StatefulWidget {
   static String routeName = '/dashboard';
-  final bool modoFacturas; 
+  final bool modoFacturas;
 
   const DashboardScreen({Key? key, this.modoFacturas = false})
     : super(key: key);
@@ -38,7 +39,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
         const Duration(seconds: 15),
       );
       final data = response;
-    
 
       setState(() {
         nombres = data['nombres'] ?? "";
@@ -124,14 +124,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                       if (widget.modoFacturas) {
                         if (serviceName == 'Agua') {
-                          Navigator.pushNamed(context, '/factura-agua-screen');
-                        } else if (serviceName == 'Energia') {
-                          Navigator.pushNamed(
+                          Navigator.push(
                             context,
-                            '/factura-energia-screen',
+                            MaterialPageRoute(
+                              builder: (context) => const FacturaScreen(
+                                servicio: "AGUA",
+                                titulo: "Facturas de Agua",
+                              ),
+                            ),
+                          );
+                        } else if (serviceName == 'Energia') {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const FacturaScreen(
+                                servicio: "ENERGIA",
+                                titulo: "Facturas de Energía",
+                              ),
+                            ),
                           );
                         } else if (serviceName == 'Gas') {
-                          Navigator.pushNamed(context, '/factura-gas-screen');
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const FacturaScreen(
+                                servicio: "GAS",
+                                titulo: "Facturas de Gas",
+                              ),
+                            ),
+                          );
                         }
                       } else {
                         if (serviceName == 'Agua') {
@@ -267,9 +288,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             children: [
               const CircleAvatar(
                 radius: 70,
-                backgroundImage: NetworkImage(
-                  '/images/profile.jpg',
-                ),
+                backgroundImage: NetworkImage('/images/profile.jpg'),
               ),
               const SizedBox(height: 12),
               Text(
@@ -291,19 +310,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Column(
       children: [
         ListTile(
+          leading: const Icon(Icons.house_outlined),
+          title: const Text("Inicio"),
+          onTap: () async {
+            Navigator.pushNamed(context, '/dashboard');
+          },
+        ),
+        ListTile(
           leading: const Icon(Icons.home_max_outlined),
-          title: const Text("mi perfil"),
-          onTap: ()async {
-           final result = await Navigator.pushNamed(context, '/perfil-screen');
-    if (result == true) {
-      _loadUsuarioData();
-    }
-           },
+          title: const Text("Mi perfil"),
+          onTap: () async {
+            final result = await Navigator.pushNamed(context, '/perfil-screen');
+            if (result == true) {
+              _loadUsuarioData();
+            }
+          },
         ),
         ListTile(
           leading: const Icon(Icons.favorite_border),
           title: const Text('Integrantes de Familia'),
-          onTap: () {},
+          onTap: () async {
+            final result = await Navigator.pushNamed(
+              context,
+              '/miembros-screen',
+            );
+          },
         ),
         ListTile(
           leading: const Icon(Icons.receipt_long),
@@ -328,36 +359,38 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   void _confirmarLogout(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext ctx) {
-      return AlertDialog(
-        title: const Text('Cerrar sesión'),
-        content: const Text('¿Está seguro de que desea cerrar sesión?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(), // cancelar
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.of(ctx).pop(); // cerrar el diálogo
+    showDialog(
+      context: context,
+      builder: (BuildContext ctx) {
+        return AlertDialog(
+          title: const Text('Cerrar sesión'),
+          content: const Text('¿Está seguro de que desea cerrar sesión?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(), // cancelar
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(ctx).pop(); // cerrar el diálogo
 
-              await LoginService.logout(); // eliminar token
+                await LoginService.logout(); // eliminar token
 
-              // 🔹 Navegar al LoginScreen y limpiar historial
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                '/login-screen',
-                (route) => false,
-              );
-            },
-            child: const Text('Cerrar sesión', style: TextStyle(color: Colors.redAccent)),
-          ),
-        ],
-      );
-    },
-  );
-}
-
+                // 🔹 Navegar al LoginScreen y limpiar historial
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/login-screen',
+                  (route) => false,
+                );
+              },
+              child: const Text(
+                'Cerrar sesión',
+                style: TextStyle(color: Colors.redAccent),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }

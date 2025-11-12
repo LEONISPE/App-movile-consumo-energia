@@ -8,10 +8,12 @@ public interface UsuarioService {
 
 
     DTOadmin crearAdmin(DTOadmin dtOadmin);
-    DTOusuarios crearUsuarios(DTOusuarios dtOusuarios);
+    DTOusuarios crearUsuarios(DTOusuarios dtOusuarios, Long id_hogar);
     void updateUsuarios(DTOUpdateUsuario dtoUpdateUsuario);
     DTOusuariosResponse getUsuarios();
-    void AutorizarMiembro(Long id);
     void SetearEmailMiebro(DTOEmailMiebro dtoEmailMiebro, Long id);
     void  actualizarPasword(DTOUpdatePassword dtoUpdatePassword);
+    DTOMiembro crearMiembrosHogar(DTOMiembro dtoMiembro);
+    void ComprobarEmailMiebro(DTOEmailMiebro dtoEmailMiebro);
+    void setearPasswordMiembro(DTOPasswordMiebro dto, String email);
 }

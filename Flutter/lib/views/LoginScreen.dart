@@ -1,9 +1,9 @@
-import 'package:hello_world/services/LoginService.dart';
-import 'package:hello_world/views/DashboardScreen.dart';
+import 'package:App/services/LoginService.dart';
+import 'package:App/views/ComprobarEmailMiembroScreen.dart';
+import 'package:App/views/DashboardScreen.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'dart:convert';
-
 
 final Color primaryColor = Colors.blueAccent;
 
@@ -33,7 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
       final response = await _loginService.login(email, password);
 
       if (response.statusCode == 200) {
-        //  Navegar al Dashboard si el login es correcto
+      
         Navigator.pushReplacementNamed(context, DashboardScreen.routeName);
       } else {
         //  Credenciales incorrectas
@@ -55,10 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: primaryColor,
       body: Column(
         children: [
-          const Expanded(
-            flex: 1,
-            child: SizedBox(height: 10),
-          ),
+          const Expanded(flex: 1, child: SizedBox(height: 10)),
           Expanded(
             flex: 7,
             child: Container(
@@ -86,7 +83,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const SizedBox(height: 40.0),
 
-                     
                       TextFormField(
                         controller: _emailController,
                         validator: (value) {
@@ -115,7 +111,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
                       const SizedBox(height: 25.0),
 
-                      
                       TextFormField(
                         controller: _passwordController,
                         obscureText: true,
@@ -140,9 +135,34 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
 
-                      const SizedBox(height: 35.0),
+                      SizedBox(height: 15),
 
-                     
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(
+                                context,
+                                Comprobaremailmiembroscreen.routeName,
+                              );
+                            },
+                            child: const Text(
+                              "Ingresar Contraseña como Miembro",
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black,
+                                decoration: TextDecoration.none,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: 12),
+
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
@@ -167,7 +187,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
                       const SizedBox(height: 20.0),
 
-                      
                       if (_errorMessage != null)
                         Text(
                           _errorMessage!,
@@ -175,7 +194,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
 
                       const SizedBox(height: 30.0),
-                      
                     ],
                   ),
                 ),

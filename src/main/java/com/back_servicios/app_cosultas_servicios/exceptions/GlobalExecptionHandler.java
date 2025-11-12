@@ -26,6 +26,7 @@ public class GlobalExecptionHandler {
     @Hidden
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> manejarExcepcionGeneral(Exception ex) {
+        ex.printStackTrace();
         Map<String, Object> respuesta = new HashMap<>();
         respuesta.put("error", "Ocurrió un error inesperado. Contacte con soporte.");
         respuesta.put("timestamp", LocalDateTime.now());

@@ -42,6 +42,7 @@ private final SecurityFilter securityFilter;
                         .requestMatchers(HttpMethod.POST, "/login", "/user/registrar/admin").permitAll()
                         .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll() // Allow OAuth2 endpoints
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/user/comprobar/email/miembros", "/user/miembro/set-password**").permitAll()
                         .requestMatchers("/swagger-ui.html", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

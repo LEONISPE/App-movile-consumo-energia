@@ -3,13 +3,11 @@ package com.back_servicios.app_cosultas_servicios.service;
 import com.back_servicios.app_cosultas_servicios.domain.dto.request.*;
 import com.back_servicios.app_cosultas_servicios.domain.dto.response.DTOusuariosResponse;
 import com.back_servicios.app_cosultas_servicios.domain.entity.Hogar;
-import com.back_servicios.app_cosultas_servicios.domain.entity.Persona;
 import com.back_servicios.app_cosultas_servicios.domain.entity.Usuarios;
 import com.back_servicios.app_cosultas_servicios.domain.enumerated.Role;
 import com.back_servicios.app_cosultas_servicios.domain.mapper.request.UsuarioCreateMapper;
 import com.back_servicios.app_cosultas_servicios.exceptions.ValidationException;
 import com.back_servicios.app_cosultas_servicios.repository.HogarRepository;
-import com.back_servicios.app_cosultas_servicios.repository.PersonaRepository;
 import com.back_servicios.app_cosultas_servicios.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -26,7 +24,6 @@ public class UsuarioServiceimpl  implements UsuarioService {
     private final UsuarioCreateMapper usuarioCreateMapper;
     private final UsuarioRepository usuarioRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final PersonaRepository personaRepository;
     private final HogarRepository  hogarRepository;
 
 
@@ -49,7 +46,7 @@ public class UsuarioServiceimpl  implements UsuarioService {
 
 
     @Override
-public DTOusuarios crearUsuarios(DTOusuarios dtOusuarios){
+public DTOusuarios crearUsuarios(DTOusuarios dtOusuarios, Long id_hogar){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Usuarios Auth = (Usuarios) authentication.getPrincipal();
 
@@ -64,15 +61,38 @@ public DTOusuarios crearUsuarios(DTOusuarios dtOusuarios){
         if (usuarioRepository.findByEmail(dtOusuarios.email()) != null) {
             throw new ValidationException("Email ya existe");
         }
+        if(hogarRepository.findById(id_hogar)  ==null || hogarRepository.findById(id_hogar).isEmpty()){
+            throw new ValidationException("El hogar no existe");
+        }
+          Hogar hogar =  hogarRepository.findById(id_hogar).get();
 
 
         String encryptedPassword = bCryptPasswordEncoder.encode(dtOusuarios.contraseña());
 
     Usuarios usuarios =  usuarioCreateMapper.toEntity(dtOusuarios);
     usuarios.setPassword(encryptedPassword);
+    usuarios.setHogar(hogar);
     usuarioRepository.save(usuarios);
   return dtOusuarios;
 }
+    @Override
+    public DTOMiembro crearMiembrosHogar(DTOMiembro dtoMiembro) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Usuarios Auth = (Usuarios) authentication.getPrincipal();
+
+        if (Auth.getRole() != Role.ADMIN) {
+            throw new ValidationException("solos los roles de admin pueden crear miembros del hogar");
+        }
+
+        Hogar hogar = hogarRepository.findById(dtoMiembro.getHogar_id())
+                .orElseThrow(() -> new ValidationException("Hogar no encontrado"));
+
+
+        Usuarios miembro = usuarioCreateMapper.toEntity(dtoMiembro);
+        miembro.setHogar(hogar);
+        usuarioRepository.save(miembro);
+        return dtoMiembro;
+    }
 
     @Override
     public void updateUsuarios(DTOUpdateUsuario dtoUpdateUsuario) {
@@ -80,7 +100,7 @@ public DTOusuarios crearUsuarios(DTOusuarios dtOusuarios){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Usuarios auth = (Usuarios) authentication.getPrincipal();
 
-        if (auth.getRole() == Role.DUEÑO) {
+
             Usuarios usuario = usuarioRepository.findById(auth.getIdUsuario())
                     .orElseThrow(() -> new ValidationException("Usuario no encontrado"));
 
@@ -90,16 +110,7 @@ public DTOusuarios crearUsuarios(DTOusuarios dtOusuarios){
 
             usuarioRepository.save(usuario);
 
-        } else if (auth.getRole() == Role.MIEMBRO) {
-            Persona persona = personaRepository.findById(auth.getIdUsuario())
-                    .orElseThrow(() -> new ValidationException("Persona no encontrada"));
 
-            persona.setNombre(dtoUpdateUsuario.getNombres());
-            persona.setApellido(dtoUpdateUsuario.getApellidos());
-            persona.setTelefono(dtoUpdateUsuario.getTelefono());
-
-            personaRepository.save(persona);
-        }
     }
 
 @Override
@@ -116,27 +127,7 @@ return usuarioRepository.findById(Auth.getIdUsuario())
         )).orElseThrow(() -> new ValidationException("Usuario no encontrado"));
 }
 
-@Transactional
-public void AutorizarMiembro(Long id){
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    Usuarios Auth = (Usuarios) authentication.getPrincipal();
 
-    if(Auth.getRole()!= Role.DUEÑO){
-        throw new ValidationException("Solo lo dueños de los hogares pueden autorizar");
-    }
-    Persona miembro = personaRepository.findById(id)
-            .orElseThrow(() -> new ValidationException("Miembro no encontrado."));
-
-    Hogar hogarDelDueno = Auth.getHogar();
-    if (hogarDelDueno == null) {
-        throw new ValidationException("El dueño no tiene un hogar registrado.");
-    }
-    if (!miembro.getHogar().getIdHogar().equals(hogarDelDueno.getIdHogar())) {
-        throw new ValidationException("El miembro no pertenece al mismo hogar del dueño.");
-    }
-
-    miembro.setAutorizado(true);
-}
 @Override
 public void SetearEmailMiebro(DTOEmailMiebro dtoEmailMiebro,Long id){
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -154,12 +145,10 @@ public void SetearEmailMiebro(DTOEmailMiebro dtoEmailMiebro,Long id){
         throw new ValidationException("Email ya existe");
     }
 
-    Persona miembro = personaRepository.findById(id)
+    Usuarios  miembro = usuarioRepository.findById(id)
             .orElseThrow(() -> new ValidationException("Miembro no encontrado."));
 
-    if(miembro.getAutorizado() == false){
-        throw new ValidationException("el miembro no esta autorizado");
-    }
+
 
     Hogar hogarDelDueno = Auth.getHogar();
     if (hogarDelDueno == null) {
@@ -169,32 +158,53 @@ public void SetearEmailMiebro(DTOEmailMiebro dtoEmailMiebro,Long id){
         throw new ValidationException("El miembro no pertenece al mismo hogar del dueño.");
     }
 
-    Persona persona = new Persona();
-    persona.setEmail(dtoEmailMiebro.email());
-    personaRepository.save(persona);
+
+    miembro.setEmail(dtoEmailMiebro.email());
+    miembro.setAutorizado(true);
+    usuarioRepository.save(miembro);
+
 }
 
 public void  actualizarPasword(DTOUpdatePassword dtoUpdatePassword){
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     Usuarios Auth = (Usuarios) authentication.getPrincipal();
 
-    if(usuarioRepository.findByEmail(Auth.getEmail())== null || personaRepository.findByEmail(Auth.getEmail()) == null){
-        throw new ValidationException("El usuario no existe");
-    }
     String encryptedPassword = bCryptPasswordEncoder.encode(dtoUpdatePassword.getPassword());
 
-    if(Auth.getRole() == Role.DUEÑO){
-        Usuarios usuarios = new Usuarios();
-        usuarios.setPassword(encryptedPassword);
-        usuarioRepository.save(usuarios);
+        Usuarios usuario = usuarioRepository.findById(Auth.getIdUsuario())
+                .orElseThrow(() -> new ValidationException("Usuario no encontrado"));
 
-    }else if(Auth.getRole() == Role.MIEMBRO){
-        Persona persona = new Persona();
-        persona.setPassword(encryptedPassword);
-        personaRepository.save(persona);
+        usuario.setPassword(encryptedPassword);
+        usuarioRepository.save(usuario);
+    }
+    @Override
+    public void ComprobarEmailMiebro(DTOEmailMiebro dtoEmailMiebro) {
+
+        if (dtoEmailMiebro.email() == null || dtoEmailMiebro.email().isEmpty()) {
+            throw new ValidationException("El email es obligatorio");
+        }
+
+        if (usuarioRepository.findByEmail(dtoEmailMiebro.email()) == null) {
+            throw new ValidationException("Email no existe ");
+
+        }
+
+
+    }
+
+    @Override
+    @Transactional
+    public void setearPasswordMiembro(DTOPasswordMiebro dto, String email) {
+        Usuarios miembro = usuarioRepository.findByEmail(email);
+        if(miembro == null){
+            throw new ValidationException("El email no está asociado a ningún miembro");
+        }
+
+        String encryptedPassword = bCryptPasswordEncoder.encode(dto.password());
+        miembro.setPassword(encryptedPassword);
+
+        usuarioRepository.save(miembro);
+    }
     }
 
 
-}
-
-}

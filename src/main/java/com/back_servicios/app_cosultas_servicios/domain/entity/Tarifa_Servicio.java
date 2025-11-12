@@ -16,6 +16,7 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "tarifa_servicio")
 public class Tarifa_Servicio {
 
     @Id

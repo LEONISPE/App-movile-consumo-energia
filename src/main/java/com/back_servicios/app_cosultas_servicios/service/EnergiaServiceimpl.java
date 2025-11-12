@@ -3,7 +3,6 @@ package com.back_servicios.app_cosultas_servicios.service;
 import com.back_servicios.app_cosultas_servicios.domain.dto.response.ConsumoDTODiarioEnergia;
 import com.back_servicios.app_cosultas_servicios.domain.dto.response.DTOConsumoAcomuladoEnergia;
 import com.back_servicios.app_cosultas_servicios.domain.entity.*;
-import com.back_servicios.app_cosultas_servicios.domain.enumerated.Estrato_Agua;
 import com.back_servicios.app_cosultas_servicios.domain.enumerated.Estrato_Energia;
 import com.back_servicios.app_cosultas_servicios.domain.enumerated.ServiciosEnum;
 import com.back_servicios.app_cosultas_servicios.exceptions.ValidationException;
@@ -43,7 +42,7 @@ public class EnergiaServiceimpl  implements EnergiaService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Usuarios principal = (Usuarios) auth.getPrincipal();
 
-        Hogar hogar = hogarRepository.findByUsuarioIdUsuario(principal.getIdUsuario())
+        Hogar hogar = hogarRepository.findByUsuarios_IdUsuario(principal.getIdUsuario())
                 .orElseThrow(() -> new ValidationException("Hogar no encontrado"));
 
         Servicios servicioEnergia = serviciosRepository.findByServicios(ServiciosEnum.ENERGIA)
@@ -97,7 +96,7 @@ public class EnergiaServiceimpl  implements EnergiaService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Usuarios principal = (Usuarios) auth.getPrincipal();
 
-        Hogar hogar = hogarRepository.findByUsuarioIdUsuario(principal.getIdUsuario())
+        Hogar hogar = hogarRepository.findByUsuarios_IdUsuario(principal.getIdUsuario())
                 .orElseThrow(() -> new ValidationException("Hogar no encontrado"));
 
         Servicios servicioEnergia = serviciosRepository.findByServicios(ServiciosEnum.AGUA)

@@ -2,7 +2,6 @@ package com.back_servicios.app_cosultas_servicios.controller;
 
 import com.back_servicios.app_cosultas_servicios.domain.dto.request.DTOhogar;
 import com.back_servicios.app_cosultas_servicios.domain.dto.request.DTOpersona;
-import com.back_servicios.app_cosultas_servicios.service.PersonaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;

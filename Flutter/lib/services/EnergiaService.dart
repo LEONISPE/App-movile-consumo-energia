@@ -1,12 +1,14 @@
 import 'dart:convert';
-import 'package:hello_world/services/LoginService.dart';
+import 'package:App/config/api_config.dart';
 import 'package:http/http.dart' as http;
+
+import 'LoginService.dart';
 
 
 class EnergiaService {
 
   Future<Map<String, dynamic>> getDataEnergiaDiario() async{
-   final url = Uri.parse('http://localhost:8080/energia/consumo');
+   final url = Uri.parse('${ApiConfig.baseUrl}/energia/consumo');
 
     final token = LoginService.token;
 
@@ -26,7 +28,7 @@ class EnergiaService {
   }
 
   Future<Map<String, dynamic>> getDataEnergiaAcomulado() async{
-   final url = Uri.parse('http://localhost:8080/energia/consumo/acomulado');
+   final url = Uri.parse('${ApiConfig.baseUrl}/energia/consumo/acomulado');
 
   final token = LoginService.token;
 

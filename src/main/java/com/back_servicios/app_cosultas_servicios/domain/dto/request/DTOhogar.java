@@ -18,10 +18,10 @@ public class DTOhogar {
     private String calle;
     private String carrera;
     private Ciudad ciudad;
-    private Estrato_Agua estratoAgua;
-    private Estrato_Energia estratoEnergia;
     private Estrato_Gas estratoGas;
+    private Estrato_Agua estratoAgua;
     private int numeroIntegrantesOriginal;
     private double sumaFactoresOriginales;
+    private Estrato_Energia estratoEnergia;
 
 }

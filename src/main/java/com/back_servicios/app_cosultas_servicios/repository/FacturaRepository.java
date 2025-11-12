@@ -27,15 +27,16 @@ public interface FacturaRepository extends JpaRepository<Factura, Long> {
     Optional<Factura> findTopByHogar_IdHogarAndServicios_ServiciosOrderByFechaPeriodoFinDesc(Long hogarId, ServiciosEnum servicioEnum);
 
     @Query("""
-       SELECT f 
-       FROM Factura f 
-       WHERE f.hogar.usuario.idUsuario = :usuarioId 
+       SELECT f
+       FROM Factura f
+       JOIN f.hogar h
+       JOIN h.usuarios u
+       WHERE u.idUsuario = :usuarioId
        AND f.servicios.servicios = :servicio
        """)
     List<Factura> findByUsuarioAndServicio(
             @Param("usuarioId") Long usuarioId,
             @Param("servicio") ServiciosEnum servicio
     );
-
 
 }

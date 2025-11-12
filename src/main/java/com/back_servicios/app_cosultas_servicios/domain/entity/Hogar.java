@@ -21,6 +21,7 @@ import java.util.List;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "hogar")
 public class Hogar {
 
     @Id
@@ -51,10 +52,9 @@ public class Hogar {
 
 
 
-    @OneToOne
+    @OneToMany(mappedBy = "hogar", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
-    @JoinColumn(name = "usuario_id")
-    private Usuarios usuario;
+    private List<Usuarios> usuarios;
 
     @OneToMany(mappedBy = "hogar", cascade = CascadeType.ALL)
     @JsonIgnore
@@ -63,8 +63,6 @@ public class Hogar {
     @OneToMany(mappedBy = "hogar")
     private List<Consumo_Servicio> consumo_servicio;
 
-    @OneToMany(mappedBy = "hogar", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
-    private List<Persona> personas = new ArrayList<>();
+
 
 }

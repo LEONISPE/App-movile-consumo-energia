@@ -1,8 +1,9 @@
 
 import 'dart:convert';
 
+import 'package:App/config/api_config.dart';
+import 'package:App/services/LoginService.dart';
 import 'package:flutter/material.dart';
-import 'package:hello_world/services/LoginService.dart';
 import 'package:http/http.dart' as http;
 
 class Perfilservice {
@@ -13,7 +14,7 @@ class Perfilservice {
     required String apellidos,
     required String telefono,
   }) async {
-    final url = Uri.parse('http://localhost:8080/user/update/usuario');
+    final url = Uri.parse('${ApiConfig.baseUrl}/user/update/usuario');
     final token = LoginService.token;
 
     final body = jsonEncode({
@@ -41,7 +42,7 @@ class Perfilservice {
 Future<bool> updatePassword({
   required String password,
 }) async {
-  final url = Uri.parse('http://localhost:8080/user/update/password');
+  final url = Uri.parse('${ApiConfig.baseUrl}/user/update/password');
   final token = LoginService.token;
 
   final body = jsonEncode({
