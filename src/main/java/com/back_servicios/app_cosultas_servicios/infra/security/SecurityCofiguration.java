@@ -55,7 +55,16 @@ private final SecurityFilter securityFilter;
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+
+
+        configuration.setAllowedOriginPatterns(Arrays.asList(
+                "http://localhost:*",                       // Para desarrollo Flutter web local
+                "http://127.0.0.1:*",                       // Algunos navegadores usan esto
+                "http://18.118.73.200",                     // IP pública sin puerto
+                "http://18.118.73.200:*",                   // Cualquier puerto
+                "https://flutter-web-deploy-8347.vercel.app" // Producción en Vercel
+        ));
+
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
@@ -64,6 +73,7 @@ private final SecurityFilter securityFilter;
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
             throws Exception

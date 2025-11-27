@@ -1,0 +1,1 @@
+ C:\\Users\\juanc\\OneDrive\\Escritorio\\flutter-course\\App-movile-consumo-energia\\Flutter\\.dart_tool\\flutter_build\\d9c370171c8d3d4701d95fd291a34ee6\\dart_build_result.json: 

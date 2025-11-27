@@ -19,7 +19,7 @@ public class IntegrantesFamilia {
         return FACTORES.getOrDefault(categoria, 1.0);
     }
 
-    // ✅ Ahora calcula usando los usuarios del hogar
+    // Ahora calcula usando los usuarios del hogar
     public static double calcularFactorHogar(Hogar hogar) {
 
         List<Usuarios> miembros = hogar.getUsuarios();  // Dueño + miembros
@@ -38,7 +38,7 @@ public class IntegrantesFamilia {
         if (integrantesOriginales == 0) return 1.0;
 
         // 3️⃣ Normalización (consumo actual / consumo inicial esperado)
-        double sumaFactoresOriginales = integrantesOriginales * 1.0; // 1.0 es consumo estándar base
+        double sumaFactoresOriginales = hogar.getSumaFactoresOriginales(); // 1.0 es consumo estándar base
 
         return sumaFactoresActuales / sumaFactoresOriginales;
     }

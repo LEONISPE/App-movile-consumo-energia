@@ -24,7 +24,7 @@ class FacturaScreen extends StatefulWidget {
 }
 
 class _FacturaScreenState extends State<FacturaScreen> {
-  final AguaService _service = AguaService(); // Renómbralo si quieres
+  final AguaService _service = AguaService(); 
   List<Factura> facturas = [];
   bool isLoading = true;
 
