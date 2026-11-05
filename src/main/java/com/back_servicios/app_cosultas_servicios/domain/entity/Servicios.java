@@ -27,7 +27,10 @@ public class Servicios {
    @Enumerated(EnumType.STRING)
    private ServiciosEnum  servicios;
 
-
+    /**
+     * Unidad de medida métrica asignada al servicio público.
+     * Ejemplo: Agua y Gas se miden en metros cúbicos ($m^3$), mientras que la Luz/Energía se mide en kilovatios (kWh).
+     */
    @Enumerated(EnumType.STRING)
     private Unidad unidad;
 

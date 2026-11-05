@@ -7,5 +7,6 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface ConsumoServicioCreateMapper {
 
+    /** Convierte un DTO de creacion a la entidad Consumo Servicios. */
     Consumo_Servicio toEntity(DTOconsumoServicio dtOconsumoServicio);
 }

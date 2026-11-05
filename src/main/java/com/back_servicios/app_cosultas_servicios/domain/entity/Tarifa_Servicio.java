@@ -24,9 +24,14 @@ public class Tarifa_Servicio {
     @Column(name = "id_tarifa")
     private Long idTarifa;
 
+    /** Precio unitario estipulado para el cálculo del costo del consumo del servicio. */
     private BigDecimal preciounidad;
+
+    /** Fecha de inicio a partir de la cual entra a regir la tarifa vigente. */
     @Column(name = "fecha_inicio")
     private LocalDate fechaInicio;
+
+    /** Fecha de cierre o caducidad en la que deja de aplicar la tarifa. */
     @Column(name = "fecha_fin")
     private LocalDate fechaFin;
 

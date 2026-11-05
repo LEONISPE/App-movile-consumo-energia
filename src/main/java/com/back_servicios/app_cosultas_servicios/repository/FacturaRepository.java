@@ -12,8 +12,10 @@ import java.util.Optional;
 
 public interface FacturaRepository extends JpaRepository<Factura, Long> {
 
-
-
+    /**
+     * Calcula el promedio total de consumo de las facturas históricas registradas para un hogar y servicio determinados.
+     * Sirve como base matemática para proyectar el consumo y costo estimado del ciclo actual.
+     */
     @Query("SELECT AVG(f.consumoTotal) " +
             "FROM Factura f " +
             "WHERE f.hogar.idHogar = :hogarId " +
@@ -22,10 +24,16 @@ public interface FacturaRepository extends JpaRepository<Factura, Long> {
                                        @Param("servicioEnum") ServiciosEnum servicioEnum);
 
 
-
+    /**
+     * Busca y retorna la factura más reciente de un hogar y servicio ordenadas de forma descendente
+     * según la fecha de finalización del periodo facturado.
+     */
 
     Optional<Factura> findTopByHogar_IdHogarAndServicios_ServiciosOrderByFechaPeriodoFinDesc(Long hogarId, ServiciosEnum servicioEnum);
 
+    /**
+     * Obtiene el listado completo de facturas asociadas a un usuario específico filtradas por un servicio público determinado.
+     */
     @Query("""
        SELECT f
        FROM Factura f

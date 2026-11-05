@@ -37,7 +37,10 @@ public class Usuarios  implements UserDetails {
     private Role role;
     @Enumerated(EnumType.STRING)
     private Categoria categoria;
-
+    /**
+     * Indica si el usuario se encuentra activo o autorizado dentro del sistema.
+     * Permite denegar el acceso a miembros inhabilitados sin necesidad de eliminarlos físicamente de la base de datos.
+     */
     private Boolean autorizado;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -45,6 +48,10 @@ public class Usuarios  implements UserDetails {
     @JsonBackReference
     private Hogar hogar;
 
+    /**
+     * Asigna los permisos y roles de seguridad basados en Spring Security.
+     * Si el usuario no tiene rol asignado, retorna una lista vacía sin privilegios especiales.
+     */
    @Override
    public Collection<? extends GrantedAuthority> getAuthorities() {
        if (role == null) {
@@ -53,31 +60,39 @@ public class Usuarios  implements UserDetails {
        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
    }
 
+
     @Override
     public String getPassword() {
         return password;
     }
 
+    /**
+     * Retorna el correo electrónico como el identificador único (username) para la autenticación.
+     */
     @Override
     public String getUsername() {
        return email;
     }
 
+    /** Indica si la cuenta del usuario no ha expirado (Por defecto true según Spring Security). */
     @Override
     public boolean isAccountNonExpired() {
         return UserDetails.super.isAccountNonExpired();
     }
 
+    /** Indica si la cuenta del usuario no está bloqueada (Por defecto true según Spring Security). */
     @Override
     public boolean isAccountNonLocked() {
         return UserDetails.super.isAccountNonLocked();
     }
 
+    /** Indica si las credenciales del usuario no han expirado (Por defecto true según Spring Security). */
     @Override
     public boolean isCredentialsNonExpired() {
         return UserDetails.super.isCredentialsNonExpired();
     }
 
+    /** Indica si el usuario está activo y habilitado en el sistema (Por defecto true según Spring Security). */
     @Override
     public boolean isEnabled() {
         return UserDetails.super.isEnabled();

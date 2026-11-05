@@ -22,14 +22,20 @@ public class Factura {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "factura_id")
     private Long facturaId;
+
+    /** Fecha exacta en la que inicia el periodo de cobro y medición del recibo. */
     @Column(name = "fecha_periodo_inicio")
     private LocalDate fecha_periodoInicio;
 
+    /** Fecha exacta en la que finaliza el ciclo de facturación mensual. */
     @Column(name = "fechaPeriodoFin")
     private LocalDate fechaPeriodoFin;
 
+    /** Volumen total de consumo registrado durante todo el periodo del recibo. */
     @Column(name = "consumo_total")
     private BigDecimal consumoTotal;
+
+    /** Costo monetario total calculado para la factura en base al consumo y tarifas vigentes. */
     private BigDecimal costo_total;
 
     @ManyToOne

@@ -17,6 +17,19 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
+/**
+        * <h1>Implementación del servicio de gestión de usuarios</h1>
+        * <p>
+ * Clase de servicio encargada de centralizar la lógica de negocio relacionada con la administración
+ * de usuarios dentro del sistema de consumo energético (Administradores, Dueños de hogares y Miembros).
+        * </p>
+        * Maneja el registro seguro con cifrado de contraseñas (BCrypt), validaciones de unicidad de correos,
+ * asociación de miembros a hogares específicos y control de accesos basados en roles mediante Spring Security.
+        *
+        * @author SQA Team
+        * @version 1.0
+        */
+
 @Service
 @AllArgsConstructor
 public class UsuarioServiceimpl  implements UsuarioService {
@@ -27,14 +40,34 @@ public class UsuarioServiceimpl  implements UsuarioService {
     private final HogarRepository  hogarRepository;
 
 
+    /*
+     * Valida que el correo electrónico cumpla con los formatos requeridos y no se encuentre
+     * previamente registrado en la base de datos para evitar duplicidades.
+     *
+     * @param email Correo electrónico a verificar.
+     * @throws ValidationException Si el email es nulo, está vacío (tras aplicar trim) o ya existe.
+     */
+    private void validarEmailUnico(String email) {
+        // Validación de espacios vacíos mediante trim() para evitar cadenas con espacios en blanco inválidos
+        if (email == null || email.trim().isEmpty()) {
+            throw new ValidationException("El email es obligatorio y no puede estar vacío");
+        }
+        if (usuarioRepository.findByEmail(email) != null) {
+            throw new ValidationException("El email ya se encuentra registrado");
+        }
+    }
+
+    /**
+     * Registra un nuevo usuario con rol de Administrador en el sistema, aplicando encriptación
+     * a su contraseña mediante BCrypt.
+     *
+     * @param dtOadmin Objeto DTO con los datos de acceso del administrador.
+     * @return El DTO recibido tras completar el registro exitoso.
+     */
     @Override
     public DTOadmin crearAdmin(DTOadmin dtOadmin){
-        if(dtOadmin.getEmail() == null || dtOadmin.getEmail().isEmpty()){
-            throw new ValidationException("El email es obligatorio");
-        }
-        if(usuarioRepository.findByEmail(dtOadmin.getEmail())  !=null){
-            throw new ValidationException("El email ya existe");
-        }
+        validarEmailUnico(dtOadmin.getEmail());
+        // Cifrado robusto de la contraseña del administrador utilizando BCrypt con salt automático
         String encryptedPassword = bCryptPasswordEncoder.encode(dtOadmin.getContraseña());
         Usuarios usuarios = new Usuarios();
         usuarios.setEmail(dtOadmin.getEmail());
@@ -44,29 +77,23 @@ public class UsuarioServiceimpl  implements UsuarioService {
         return dtOadmin;
     }
 
+    /**
+     * Registra un nuevo usuario principal (Dueño de hogar), validando su correo, encriptando su contraseña
+     * y asociándolo directamente al hogar especificado por su ID.
+     *
+     * @param dtOusuarios Datos del usuario a registrar.
+     * @param id_hogar    Identificador único del hogar al que pertenecerá el usuario.
+     * @return El DTO del usuario creado.
+     */
 
     @Override
 public DTOusuarios crearUsuarios(DTOusuarios dtOusuarios, Long id_hogar){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Usuarios Auth = (Usuarios) authentication.getPrincipal();
+        validarEmailUnico(dtOusuarios.email());
 
-   if(Auth.getRole()!= Role.ADMIN){
-       throw new ValidationException("solos los roles de admin pueden crear user nuevos");
-   }
+        Hogar hogar = hogarRepository.findById(id_hogar)
+                .orElseThrow(() -> new ValidationException("El hogar no existe"));
 
-        if (dtOusuarios.email() == null) {
-            throw new ValidationException("Email no puede estar vacio");
-        }
-
-        if (usuarioRepository.findByEmail(dtOusuarios.email()) != null) {
-            throw new ValidationException("Email ya existe");
-        }
-        if(hogarRepository.findById(id_hogar)  ==null || hogarRepository.findById(id_hogar).isEmpty()){
-            throw new ValidationException("El hogar no existe");
-        }
-          Hogar hogar =  hogarRepository.findById(id_hogar).get();
-
-
+// Encriptación de la credencial de acceso para el usuario principal o dueño del hogar
         String encryptedPassword = bCryptPasswordEncoder.encode(dtOusuarios.contraseña());
 
     Usuarios usuarios =  usuarioCreateMapper.toEntity(dtOusuarios);
@@ -75,14 +102,15 @@ public DTOusuarios crearUsuarios(DTOusuarios dtOusuarios, Long id_hogar){
     usuarioRepository.save(usuarios);
   return dtOusuarios;
 }
+
+    /**
+     * Registra un miembro adicional dentro de un hogar existente en el sistema.
+     *
+     * @param dtoMiembro Objeto con la información del miembro del hogar.
+     * @return El DTO del miembro registrado.
+     */
     @Override
     public DTOMiembro crearMiembrosHogar(DTOMiembro dtoMiembro) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Usuarios Auth = (Usuarios) authentication.getPrincipal();
-
-        if (Auth.getRole() != Role.ADMIN) {
-            throw new ValidationException("solos los roles de admin pueden crear miembros del hogar");
-        }
 
         Hogar hogar = hogarRepository.findById(dtoMiembro.getHogar_id())
                 .orElseThrow(() -> new ValidationException("Hogar no encontrado"));
@@ -94,6 +122,12 @@ public DTOusuarios crearUsuarios(DTOusuarios dtOusuarios, Long id_hogar){
         return dtoMiembro;
     }
 
+    /**
+     * Actualiza la información personal básica (nombres, apellidos y teléfono) del usuario
+     * que se encuentra actualmente autenticado en la sesión.
+     *
+     * @param dtoUpdateUsuario Objeto con los nuevos datos personales.
+     */
     @Override
     public void updateUsuarios(DTOUpdateUsuario dtoUpdateUsuario) {
 
@@ -112,6 +146,11 @@ public DTOusuarios crearUsuarios(DTOusuarios dtOusuarios, Long id_hogar){
 
 
     }
+    /**
+     * Obtiene y retorna los datos detallados del perfil del usuario autenticado actualmente en sesión.
+     *
+     * @return Un DTO con la información de nombres, apellidos, correo y teléfono del usuario.
+     */
 
 @Override
 public DTOusuariosResponse getUsuarios(){
@@ -126,7 +165,13 @@ return usuarioRepository.findById(Auth.getIdUsuario())
                 usuarios.getTelefono()
         )).orElseThrow(() -> new ValidationException("Usuario no encontrado"));
 }
-
+    /**
+     * Permite exclusivamente al usuario con rol DUEÑO configurar y asignar el correo electrónico definitivo
+     * que utilizará un miembro de su hogar para iniciar sesión en la aplicación móvil.
+     *
+     * @param dtoEmailMiebro Nuevo correo a asignar al miembro.
+     * @param id             Identificador único del miembro a actualizar.
+     */
 
 @Override
 public void SetearEmailMiebro(DTOEmailMiebro dtoEmailMiebro,Long id){
@@ -137,13 +182,8 @@ public void SetearEmailMiebro(DTOEmailMiebro dtoEmailMiebro,Long id){
         throw new ValidationException("Solo lo dueños de los hogares pueden hacer esta accion");
     }
 
-    if(dtoEmailMiebro.email() == null || dtoEmailMiebro.email().isEmpty()){
-        throw new ValidationException("El email es obligatorio");
-    }
+    validarEmailUnico(dtoEmailMiebro.email());
 
-    if (usuarioRepository.findByEmail(dtoEmailMiebro.email()) != null) {
-        throw new ValidationException("Email ya existe");
-    }
 
     Usuarios  miembro = usuarioRepository.findById(id)
             .orElseThrow(() -> new ValidationException("Miembro no encontrado."));
@@ -165,6 +205,11 @@ public void SetearEmailMiebro(DTOEmailMiebro dtoEmailMiebro,Long id){
 
 }
 
+    /**
+     * Actualiza la contraseña de acceso del usuario autenticado actual, aplicando cifrado BCrypt.
+     *
+     * @param dtoUpdatePassword Objeto que contiene la nueva contraseña.
+     */
 public void  actualizarPasword(DTOUpdatePassword dtoUpdatePassword){
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     Usuarios Auth = (Usuarios) authentication.getPrincipal();
@@ -177,12 +222,16 @@ public void  actualizarPasword(DTOUpdatePassword dtoUpdatePassword){
         usuario.setPassword(encryptedPassword);
         usuarioRepository.save(usuario);
     }
+    /**
+     * Comprueba que el correo electrónico del miembro cumpla con las validaciones de unicidad
+     * y exista en el sistema.
+     *
+     * @param dtoEmailMiebro Correo del miembro a comprobar.
+     */
     @Override
     public void ComprobarEmailMiebro(DTOEmailMiebro dtoEmailMiebro) {
 
-        if (dtoEmailMiebro.email() == null || dtoEmailMiebro.email().isEmpty()) {
-            throw new ValidationException("El email es obligatorio");
-        }
+        validarEmailUnico(dtoEmailMiebro.email());
 
         if (usuarioRepository.findByEmail(dtoEmailMiebro.email()) == null) {
             throw new ValidationException("Email no existe ");
@@ -192,6 +241,12 @@ public void  actualizarPasword(DTOUpdatePassword dtoUpdatePassword){
 
     }
 
+    /**
+     * Establece y encripta la contraseña inicial para un miembro del hogar utilizando su correo electrónico.
+     *
+     * @param dto   Objeto que contiene la contraseña a configurar.
+     * @param email Correo electrónico asociado al miembro.
+     */
     @Override
     @Transactional
     public void setearPasswordMiembro(DTOPasswordMiebro dto, String email) {

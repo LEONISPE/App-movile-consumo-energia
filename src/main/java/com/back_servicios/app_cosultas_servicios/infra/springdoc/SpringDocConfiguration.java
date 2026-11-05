@@ -9,6 +9,12 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Clase de configuración para la documentación interactiva de la API utilizando SpringDoc OpenAPI (Swagger).
+ * Configura los metadatos globales de la aplicación (título, descripción, versión, contacto y licencia),
+ * además de registrar el esquema de seguridad global basado en JSON Web Tokens (Bearer Auth - "bearer-key")
+ * para permitir la autenticación directamente desde la interfaz gráfica de Swagger UI.
+ */
 @Configuration
 public class SpringDocConfiguration {
     @Bean

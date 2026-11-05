@@ -11,7 +11,7 @@
 	<groupId>com.back-app-consulta-servicios</groupId>
 	<artifactId>app-cosultas-servicios</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>app-cosultas-servicios</name>
+	<name>app-cosultas-servicios-v2</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
 	<licenses>
@@ -28,6 +28,9 @@
 	</scm>
 	<properties>
 		<java.version>21</java.version>
+		<!-- Propiedades de SonarQube para que no tengas que escribirlas en la terminal -->
+		<sonar.host.url>http://localhost:9000</sonar.host.url>
+		<sonar.token>squ_13ed04d11b6145a366880b2ae9f9e34cb28ca464</sonar.token>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -87,6 +90,7 @@
 			<scope>test</scope>
 		</dependency>
 
+
 	</dependencies>
 
 	<build>
@@ -107,9 +111,9 @@
 							<version>1.5.5.Final</version>
 						</path>
 					</annotationProcessorPaths>
-
 				</configuration>
 			</plugin>
+
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
@@ -122,7 +126,13 @@
 					</excludes>
 				</configuration>
 			</plugin>
+
+			<!-- Plugin de SonarQube integrado -->
+			<plugin>
+				<groupId>org.sonarsource.scanner.maven</groupId>
+				<artifactId>sonar-maven-plugin</artifactId>
+				<version>4.0.0.4121</version>
+			</plugin>
 		</plugins>
 	</build>
-
 </project>

@@ -25,6 +25,13 @@ import java.util.Arrays;
 @EnableWebSecurity
 @EnableScheduling
 @AllArgsConstructor
+
+/**
+ * Clase de configuración central de Spring Security.
+ * Define la cadena de filtros de seguridad HTTP, la política de sesiones Stateless (sin estado),
+ * la configuración de orígenes cruzados (CORS), las reglas de acceso a endpoints públicos/privados,
+ * el encriptador de credenciales y el gestor de autenticación global.
+ */
 public class SecurityCofiguration {
 
 private final SecurityFilter securityFilter;
@@ -51,7 +58,10 @@ private final SecurityFilter securityFilter;
 
 
 
-
+    /**
+     * Configura las políticas de CORS permitiendo peticiones desde entornos de desarrollo local,
+     * despliegues móviles y servidores en la nube (AWS/Vercel).
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -61,8 +71,7 @@ private final SecurityFilter securityFilter;
                 "http://localhost:*",                       // Para desarrollo Flutter web local
                 "http://127.0.0.1:*",                       // Algunos navegadores usan esto
                 "http://18.118.73.200",                     // IP pública sin puerto
-                "http://18.118.73.200:*",                   // Cualquier puerto
-                "https://flutter-web-deploy-8347.vercel.app" // Producción en Vercel
+                "http://18.118.73.200:*"                   // Cualquier puerto
         ));
 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));

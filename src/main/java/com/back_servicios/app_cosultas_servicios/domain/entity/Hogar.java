@@ -44,9 +44,16 @@ public class Hogar {
     @Column(name = "estrato_gas")
     private Estrato_Gas estratoGas;
 
+    /**
+     * Cantidad total de integrantes registrados originalmente en el hogar al momento de su alta en el sistema.
+     */
     @Column(name = "numero_integrantes_original")
     private int numeroIntegrantesOriginal;
 
+    /**
+     * Sumatoria de los factores de ponderación según el perfil de los integrantes (ej. adultos vs. menores de edad),
+     * reflejando el peso relativo del consumo familiar real.
+     */
     @Column(name = "suma_factores_originales")
     private double sumaFactoresOriginales;
 

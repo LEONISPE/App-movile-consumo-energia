@@ -7,5 +7,6 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface HogarCreateMapper {
 
+    /** Convierte un DTO de creacion a la entidad Hogar. */
     Hogar toEntity(DTOhogar dtohogar);
 }

@@ -18,6 +18,18 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
 
+/**
+ * <h1>Implementación del Servicio de Gestión de Facturas</h1>
+ * <p>
+ * Servicio encargado de la creación explícita de comprobantes de facturación y de la
+ * consulta histórica de recibos generados por usuario y tipo de servicio público.
+ * </p>
+ *
+ * @author SQA Team
+ * @version 1.0
+ */
+
+
 @Service
 @AllArgsConstructor
 public class FacturaServiceimpl  implements FacturaService {
@@ -29,15 +41,16 @@ public class FacturaServiceimpl  implements FacturaService {
     private final PrecioTarifaRepository precioTarifaRepository;
 
 
+
+    /**
+     * Registra una nueva factura calculando el costo total a partir del consumo
+     * registrado en el DTO y la tarifa por unidad vigente en el sistema.
+     *
+     * @param dtOfactura Objeto DTO con los datos de consumo, hogar y servicio.
+     * @throws ValidationException Si el hogar, servicio o tarifa no existen.
+     */
     @Override
     public void crearFactura(DTOfactura dtOfactura) {
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Usuarios Auth = (Usuarios) authentication.getPrincipal();
-
-        if(Auth.getRole() != Role.ADMIN){
-            throw new ValidationException("El usuario no tiene role administrador");
-        }
 
         Hogar hogar = hogarRepository.findById(dtOfactura.getHogar_id())
                 .orElseThrow(() -> new ValidationException("Hogar no encontrado"));
@@ -48,6 +61,7 @@ public class FacturaServiceimpl  implements FacturaService {
         Tarifa_Servicio tarifa = precioTarifaRepository.findByServiciosId(servicios.getId())
                 .orElseThrow(() -> new ValidationException("Tarifa no encontrada"));
 
+        // Cálculo del costo total multiplicando las unidades consumidas por el precio unitario vigente
         BigDecimal costoTotal = dtOfactura.getConsumoTotal()
                 .multiply(tarifa.getPreciounidad());
 
@@ -58,6 +72,13 @@ public class FacturaServiceimpl  implements FacturaService {
         facturaRepository.save(factura);
     }
 
+    /**
+     * Consulta el historial de facturas generadas asociadas a un usuario específico y a un tipo de servicio.
+     *
+     * @param usuarioId Identificador del usuario consultante.
+     * @param servicio  Tipo de servicio público (AGUA, ENERGIA, GAS).
+     * @return Lista de entidades Factura correspondientes al criterio.
+     */
     @Override
     public List<Factura> obtenerFacturasPorUsuarioYServicio(Long usuarioId, ServiciosEnum servicio) {
         return facturaRepository.findByUsuarioAndServicio(usuarioId, servicio);
